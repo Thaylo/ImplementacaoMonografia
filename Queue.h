@@ -33,6 +33,21 @@ class Queue
     item = queue_.front();
     queue_.pop();
   }
+  
+  bool ifhaspop(T& item)
+  {
+    std::unique_lock<std::mutex> mlock(mutex_);
+    if (!queue_.empty())
+    {
+        item = queue_.front();
+        queue_.pop();
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+  }
 
   void push(const T& item)
   {
@@ -41,6 +56,12 @@ class Queue
     mlock.unlock();
     cond_.notify_one();
   }
+  
+  bool empty()
+  {
+    return queue_.empty();
+  }
+  
   Queue()=default;
   Queue(const Queue&) = delete;            // disable copying
   Queue& operator=(const Queue&) = delete; // disable assignment

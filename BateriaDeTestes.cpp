@@ -46,10 +46,17 @@ void BateriaDeTestes::run(int instance_size)
 
 void runOneInstance(Queue<Task> *mq, int instance_size)
 {
-    while(true)
+    while(!mq->empty())
     {
-        Task t = mq->pop();
-
+        Task t;
+        
+        bool result = mq->ifhaspop(t);
+        
+        if(false == result)
+        {
+            break;
+        }
+        
         char nome_da_instancia[300];
         int current_best;
         int job_index;
@@ -58,14 +65,7 @@ void runOneInstance(Queue<Task> *mq, int instance_size)
         current_best = t.current_best;
         job_index = t.id;
 
-        if(job_index == -1) 
-        {
-            mq->push(t);
-            printf("pilha vazia\n");
-            break;
-        }
-
-        int max_iter = 2000;
+        int max_iter = 20;
         double alfa = 1;
         double beta = 50;
         char target[300] = "";
@@ -131,17 +131,16 @@ void runOneInstance(Queue<Task> *mq, int instance_size)
                                           timesITER, timesPRSA, timesSA, qtd_iter, qtd_prsa, qtd_sa, 
                 (char*)"GRASP com Busca Vizinhanca Local", (char*)"GRASP PRSA", (char*) "GRASP SA");
     }
-
+    printf("pilha vazia\n");
 }
 
 
 
 void runRefactored(Queue<Task> &mq, int instance_size)
 {
-    Task t;
-    t.id = -1;
-    mq.push(t);
 
+    unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
+    
     int max_iter = 2000;
     double alfa = 1;
     double beta = 50;
@@ -193,8 +192,7 @@ void runRefactored(Queue<Task> &mq, int instance_size)
     }
 	
 
-	//for(int i = 0; i < quantidade_nomes; i++)
-	for(int i = 0; i < 4; i++)
+	for(int i = 0; i < quantidade_nomes; i++)
 	{
         char outputImage[20] = "";
         sprintf(outputImage,"image%d",i);
@@ -216,20 +214,21 @@ void runRefactored(Queue<Task> &mq, int instance_size)
         t.id = i;
         strcpy(t.target,target);
         t.current_best = current_best;
-        mq.push(t); 
+        mq.push(t);
 	}
 	
-    std::thread myThreads[5];
-    for(int i = 0; i < 5; i++)
+    std::thread myThreads[concurentThreadsSupported];
+    
+    for(int i = 0; i < concurentThreadsSupported; i++)
     {
         myThreads[i] = std::thread(runOneInstance,&mq, instance_size);
     }
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < concurentThreadsSupported; i++)
     {
         myThreads[i].join();
     }
-
+       
     fclose(nomes_instancias);
     fclose(otimos_das_instancias);
 }
