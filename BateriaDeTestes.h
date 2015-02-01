@@ -45,12 +45,6 @@ public:
 	virtual ~BateriaDeTestes();
 };
 
-void runRefactored(Queue<Task> &mq, int instance_size);
-void grasp_switch(Solucao *s, Instancia *inst, PoliticaDeAlocacao politica, double alfa, 
-              double beta, int max_iter, double alfa_aleatoriedade, double *z_values, double *times, 
-                                                              int values_size, int *qtd, int gtype);
-
-
 } /* namespace std */
 
 #endif /* BATERIADETESTES_H_ */

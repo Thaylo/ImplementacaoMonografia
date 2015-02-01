@@ -9,6 +9,7 @@
 #define GRASP_H_
 
 #include "Instancia.h"
+#include "TimeSeries.h"
 #include <iostream>
 #include "Solucao.h"
 #include <cmath>
@@ -28,33 +29,28 @@ using namespace std;
 
 namespace std {
 
+typedef enum{
+    bvt,
+    sa,
+    prsa
+} grasp_config;
 
 #define SMALL_SIZE 1
 #define LARGE_SIZE 2
 
 
 void getCurrentFolder(char *bufferOut, int sizeBufferOut);
-void dump_resultsb(int instance_size, char *instance_name, char *output, double values1[], 
-              double values2[], double values3[], double times1[], double times2[], double times3[], 
-    unsigned size1, unsigned size2, unsigned size3, char* legenda1, char* legenda2, char *legenda3);
 
-#if 0
-Solucao grasp_recursivo(Instancia *inst, PoliticaDeAlocacao politica, double alfa, double beta, 
-          int max_iter, double alfa_aleatoriedade, double *z_values, double *times, int values_size, 
-                                                                                          int &qtd);
-#endif
+void dump_resultsb(int instance_size, char *instance_name, char *output, 
+                             list<Sample> *samples1, list<Sample> *samples2, list<Sample> *samples3,
+                                                    char* legenda1, char* legenda2, char *legenda3);
 
-Solucao grasp_iterado(Instancia *inst, PoliticaDeAlocacao politica, double alfa, double beta, 
-          int max_iter, double alfa_aleatoriedade, double *z_values, double *times, int values_size, 
-                                                                                          int *qtd);
-                                                                                          
-Solucao grasp_com_SA(Instancia *inst, PoliticaDeAlocacao politica, double alfa, double beta, 
-          int max_iter, double alfa_aleatoriedade, double *z_values, double *times, int values_size, 
-                                                                                          int *qtd);
-                                                                                          
-Solucao grasp_com_PRSA(Instancia *inst, PoliticaDeAlocacao politica, double alfa, double beta, 
-          int max_iter, double alfa_aleatoriedade, double *z_values, double *times, int values_size, 
-                                                                                          int *qtd);
+Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double alfa, double beta, 
+                  int max_iter, double alfa_aleatoriedade, list<Sample> *samples, grasp_config set);
+
+void dump_results_structured(int instance_size, char *instance_name, char *output, 
+                             list<Sample> &samples1, list<Sample> &samples2, list<Sample> &samples3,
+                                                    char* legenda1, char* legenda2, char *legenda3);
 
 } // End namespace
 #endif /* GRASP_H_ */

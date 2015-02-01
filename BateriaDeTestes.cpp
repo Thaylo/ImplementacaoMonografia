@@ -6,147 +6,21 @@
  */
 
 #include "BateriaDeTestes.h"
-#define GRASP_ITER 1
-#define GRASP_PRSA 2
-#define GRASP_SA 3
 
 namespace std {
 
-void grasp_switch(Solucao *s, Instancia *inst, PoliticaDeAlocacao politica, double alfa, 
-              double beta, int max_iter, double alfa_aleatoriedade, double *z_values, double *times, 
-                                                               int values_size, int *qtd, int gtype)
-{
-	switch(gtype)
-	{
-	    case GRASP_ITER:
-	    {
-	        *s = grasp_iterado(inst, politica, alfa, beta, max_iter, alfa_aleatoriedade, z_values, 
-	                                                                       times, values_size, qtd);
-	    }
-	    case GRASP_PRSA:
-	    {
-	        *s = grasp_com_PRSA(inst, politica, alfa, beta, max_iter, alfa_aleatoriedade, z_values, 
-	                                                                       times, values_size, qtd);
-	    }
-	    case GRASP_SA:
-	    {
-	        *s = grasp_com_SA(inst, politica, alfa, beta, max_iter, alfa_aleatoriedade, z_values, 
-	                                                                       times, values_size, qtd);
-	    }
-	}   	
-}
-
 BateriaDeTestes::BateriaDeTestes() {}
 
+void runOneInstance(Queue<Task> *mq, int instance_size);
 
-void BateriaDeTestes::run(int instance_size)
-{
-	runRefactored(mq, instance_size);
-}
-
-void runOneInstance(Queue<Task> *mq, int instance_size)
-{
-    while(!mq->empty())
-    {
-        Task t;
-        
-        bool result = mq->ifhaspop(t);
-        
-        if(false == result)
-        {
-            break;
-        }
-        
-        char nome_da_instancia[300];
-        int current_best;
-        int job_index;
-
-        strcpy(nome_da_instancia,t.target);
-        current_best = t.current_best;
-        job_index = t.id;
-
-        int max_iter = 20;
-        double alfa = 1;
-        double beta = 50;
-        char target[300] = "";
-        int rc = 10;
-
-        static int sizeDump = 1000;
-        double valuesITER[1000],timesITER[1000], sizeITER = sizeDump;
-        double valuesPRSA[1000],timesPRSA[1000], sizePRSA = sizeDump;
-        double valuesSA[1000],timesSA[1000], sizeSA = sizeDump;
-
-        int i = job_index;
-
-        char outputImage[20] = "";
-        sprintf(outputImage,"image%d",i);
-
-        sprintf(target,"%s",nome_da_instancia);
-        strcat(target,(char*)".txt");
-        if(rc == 0)
-        {
-            printf("Erro de leitura\n");
-            exit(0);
-        }
-        
-        char diretorioDasInstancias[200] = "";
-        getCurrentFolder(diretorioDasInstancias, sizeof(diretorioDasInstancias));
-        
-        if(instance_size == SMALL_SIZE)
-        {
-            strcat(diretorioDasInstancias,"instances/small/");
-        }
-        else
-        {
-            strcat(diretorioDasInstancias,"instances/large/");
-        }
-        strcat(diretorioDasInstancias,target);
-        
-        Instancia inst(diretorioDasInstancias);
-        
-        //Solucao sdjasa = djasa(&inst,averageRec,alfa,beta);
-        //double ava_djasa = sdjasa.avaliaSolucao(alfa,beta);
-
-        double alfa_aleatoriedade = 0.8;
-        int qtd_prsa, qtd_sa, qtd_iter;
-
-        qtd_prsa = 0;
-        qtd_sa = 0;
-        qtd_iter = 0;
-
-        Solucao giter;
-        Solucao gprsa;
-        Solucao gsa;
-	
-        grasp_switch (&giter, &inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade,   
-                                            valuesITER, timesITER, sizeITER, &qtd_iter, GRASP_ITER);
-                                            
-        grasp_switch (&gprsa, &inst ,averageRec, alfa, beta, max_iter, alfa_aleatoriedade,   
-                                            valuesPRSA, timesPRSA, sizePRSA, &qtd_prsa, GRASP_PRSA);
-                                            
-        grasp_switch (&gsa,   &inst ,averageRec, alfa, beta, max_iter, alfa_aleatoriedade,   
-                                                valuesSA,   timesSA,   sizeSA,   &qtd_sa, GRASP_SA);
-
-        dump_resultsb(instance_size, target, outputImage, valuesITER, valuesPRSA, valuesSA, 
-                                          timesITER, timesPRSA, timesSA, qtd_iter, qtd_prsa, qtd_sa, 
-                (char*)"GRASP com Busca Vizinhanca Local", (char*)"GRASP PRSA", (char*) "GRASP SA");
-    }
-    printf("pilha vazia\n");
-}
-
-
-
-void runRefactored(Queue<Task> &mq, int instance_size)
+static void runRefactored(Queue<Task> &mq, int instance_size)
 {
 
-    unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
+    static unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
     
-    int max_iter = 2000;
-    double alfa = 1;
-    double beta = 50;
     char target[300] = "";
     double current_best;
-    int rc = 10;
+    int rc = 0;
     
     char diretorioDasInstancias[200] = "";
     getCurrentFolder(diretorioDasInstancias, sizeof(diretorioDasInstancias));
@@ -190,10 +64,10 @@ void runRefactored(Queue<Task> &mq, int instance_size)
         printf("Erro, arquivos com tamanhos diferentes!!!\n");
         return;
     }
-	
+    
 
-	for(int i = 0; i < quantidade_nomes; i++)
-	{
+    for(int i = 0; i < quantidade_nomes; i++)
+    {
         char outputImage[20] = "";
         sprintf(outputImage,"image%d",i);
 
@@ -215,26 +89,117 @@ void runRefactored(Queue<Task> &mq, int instance_size)
         strcpy(t.target,target);
         t.current_best = current_best;
         mq.push(t);
-	}
-	
-    std::thread myThreads[concurentThreadsSupported];
+    }
     
-    for(int i = 0; i < concurentThreadsSupported; i++)
+    list<thread> myThreads;
+    
+    for(int i = 0; i < (int) concurentThreadsSupported; i++)
     {
-        myThreads[i] = std::thread(runOneInstance,&mq, instance_size);
+        myThreads.push_back(thread(runOneInstance,&mq, instance_size));
     }
 
-    for (int i = 0; i < concurentThreadsSupported; i++)
+    for (list<thread>::iterator it = myThreads.begin(); it != myThreads.end(); ++it)
     {
-        myThreads[i].join();
+        it->join();
     }
        
     fclose(nomes_instancias);
     fclose(otimos_das_instancias);
 }
 
+void BateriaDeTestes::run(int instance_size)
+{
+	runRefactored(mq, instance_size);
+}
+
+void runOneInstance(Queue<Task> *mq, int instance_size)
+{
+    while(!mq->empty())
+    {
+        Task t;
+        
+        bool result = mq->ifhaspop(t);
+        
+        if(false == result)
+        {
+            break;
+        }
+        
+        char nome_da_instancia[300];
+        
+        int job_index;
+
+        strcpy(nome_da_instancia,t.target);
+        job_index = t.id;
+
+        int max_iter = 100;
+        double alfa = 1;
+        double beta = 50;
+        char target[300] = "";
+        int rc = 10;
+
+        int i = job_index;
+
+        char outputImage[20] = "";
+        sprintf(outputImage,"image%d",i);
+
+        sprintf(target,"%s",nome_da_instancia);
+        strcat(target,(char*)".txt");
+        if(rc == 0)
+        {
+            printf("Erro de leitura\n");
+            exit(0);
+        }
+        
+        char diretorioDasInstancias[200] = "";
+        getCurrentFolder(diretorioDasInstancias, sizeof(diretorioDasInstancias));
+        
+        if(instance_size == SMALL_SIZE)
+        {
+            strcat(diretorioDasInstancias,"instances/small/");
+        }
+        else
+        {
+            strcat(diretorioDasInstancias,"instances/large/");
+        }
+        strcat(diretorioDasInstancias,target);
+        
+        Instancia inst(diretorioDasInstancias);
+        
+        //Solucao sdjasa = djasa(&inst,averageRec,alfa,beta);
+        //double ava_djasa = sdjasa.avaliaSolucao(alfa,beta);
+
+        double alfa_aleatoriedade = 0.8;
+
+        Solucao giter;
+        Solucao gprsa;
+        Solucao gsa;
+
+        list<Sample> samplesBvt;
+        list<Sample> samplesPrsa;
+        list<Sample> samplesSa;
+	
+        giter = grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
+                                                                                  &samplesBvt, bvt);
+
+        gprsa = grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
+                                                                                &samplesPrsa, prsa);
+
+        gsa = grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
+                                                                                    &samplesSa, sa);
+
+        dump_results_structured(instance_size, target, outputImage,
+                                                                 samplesBvt, samplesPrsa, samplesSa, 
+                         (char*)"Vizinhanca simples por trocas 2 a 2", (char*)"PRSA", (char*) "SA");
+    }
+    printf("Job done\n");
+}
+
+
+
+
+
 BateriaDeTestes::~BateriaDeTestes() {
-	// TODO Auto-generated destructor stub
 }
 
 } /* namespace std */

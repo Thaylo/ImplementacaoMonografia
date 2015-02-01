@@ -8,10 +8,11 @@
 #ifndef SOLUCAO_H_
 #define SOLUCAO_H_
 
-#define ZINF 9999999999
+#define ZINF INT_MAX
 #include "Instancia.h"
 #include "dummy_PR.h"
 #include <list>
+#include <limits.h>
 #include <assert.h>
 
 namespace std {
