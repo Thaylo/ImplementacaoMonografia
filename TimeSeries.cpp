@@ -12,7 +12,7 @@ void storeSample(list<Sample> *samples, int evaluation, double time)
 {
     Sample s = {evaluation,time};
     samples->push_back(s);
-    cout << "Storing: " << evaluation << " " << time << "\n";
+    //cout << "Storing: " << evaluation << " " << time << "\n";
 }
 
 void displayStoredSamples(list<Sample> *samples)

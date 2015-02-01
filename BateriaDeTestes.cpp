@@ -132,7 +132,7 @@ void runOneInstance(Queue<Task> *mq, int instance_size)
         strcpy(nome_da_instancia,t.target);
         job_index = t.id;
 
-        int max_iter = 100;
+        int max_iter = 2000;
         double alfa = 1;
         double beta = 50;
         char target[300] = "";
