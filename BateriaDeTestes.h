@@ -40,6 +40,10 @@ typedef struct
     Queue<list<Sample>> bvt;
     Queue<list<Sample>> prsa;
     Queue<list<Sample>> sa;
+    
+    list<Sample> meanBvt;
+    list<Sample> meanPrsa;
+    list<Sample> meanSa;
 } Summary;
 
 class BateriaDeTestes {
@@ -47,11 +51,13 @@ private:
 
 public:
     Queue<Task> mq;
+
     Summary generalSummary;
 
 	BateriaDeTestes();
 	
 	void run(int instance_size);
+    void computeMeans();
 	virtual ~BateriaDeTestes();
 };
 

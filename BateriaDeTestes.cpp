@@ -206,7 +206,10 @@ void BateriaDeTestes::run(int instance_size)
 
 
 
-
+void BateriaDeTestes::computeMeans()
+{
+    
+}
 
 
 
