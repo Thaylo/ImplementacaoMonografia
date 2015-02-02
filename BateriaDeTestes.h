@@ -15,6 +15,7 @@
     #include <thread>
 #endif /* thread */
 
+#include "TimeSeries.h"
 #include "Instancia.h"
 #include "Solucao.h"
 #include "Djasa.h"
@@ -34,11 +35,20 @@ typedef struct
     int id;
 } Task;
 
+typedef struct
+{
+    Queue<list<Sample>> bvt;
+    Queue<list<Sample>> prsa;
+    Queue<list<Sample>> sa;
+} Summary;
+
 class BateriaDeTestes {
 private:
 
 public:
     Queue<Task> mq;
+    Summary generalSummary;
+
 	BateriaDeTestes();
 	
 	void run(int instance_size);
