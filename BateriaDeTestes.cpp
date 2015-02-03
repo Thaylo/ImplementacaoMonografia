@@ -11,21 +11,17 @@ namespace std {
 
 BateriaDeTestes::BateriaDeTestes() {}
 
+void computeMeans(Summary *generalSummary);
+
 static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instance_size)
 {
-    while(!mq->empty())
+    Task t;
+    const int repetitionToComputeMeans = 5;
+    
+    while(mq->ifhaspop(t))
     {
-        Task t;
-        
-        bool result = mq->ifhaspop(t);
-        
-        if(false == result)
-        {
-            break;
-        }
-        
         char nome_da_instancia[300];
-        
+            
         int job_index;
 
         strcpy(nome_da_instancia,t.target);
@@ -70,29 +66,32 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
 
         double alfa_aleatoriedade = 0.8;
 
-        Solucao giter;
-        Solucao gprsa;
-        Solucao gsa;
+        for( int count = 0; count < repetitionToComputeMeans; ++count)
+        {
+            list<Sample> samplesBvt;
+            list<Sample> samplesPrsa;
+            list<Sample> samplesSa;
 
-        list<Sample> samplesBvt;
-        list<Sample> samplesPrsa;
-        list<Sample> samplesSa;
-    
-        giter = grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
+            
+
+        
+            (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
                                                                                   &samplesBvt, bvt);
 
-        gprsa = grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
+            (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
                                                                                 &samplesPrsa, prsa);
 
-        gsa = grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
+            (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
                                                                                     &samplesSa, sa);
 
-        generalSummary->bvt.push(samplesBvt);
-        generalSummary->prsa.push(samplesPrsa);
-        generalSummary->sa.push(samplesSa);
+            generalSummary->bvt.push(samplesBvt);
+            generalSummary->prsa.push(samplesPrsa);
+            generalSummary->sa.push(samplesSa);
 
-        dump_results_structured(instance_size, target, outputImage,
-                                                                 samplesBvt, samplesPrsa, samplesSa, 
+        }
+        computeMeans(generalSummary);
+        dump_results_structured(instance_size, target, outputImage, 
+                          generalSummary->meanBvt, generalSummary->meanPrsa, generalSummary->meanSa, 
                          (char*)"Vizinhanca simples por trocas 2 a 2", (char*)"PRSA", (char*) "SA");
     }
 
@@ -189,12 +188,6 @@ static void runRefactored(Queue<Task> &mq, Summary &generalSummary, int instance
         it->join();
     }
 
-    /* Here we must compute the means and display it*/
-    #if 0
-    void dump_results_structured(instance_size, (char *)"", (char *)"MEANS.m", 
-                             list<Sample> &samples1, list<Sample> &samples2, list<Sample> &samples3,
-                                                     char* legenda1, char* legenda2, char *legenda3)
-    #endif
     fclose(nomes_instancias);
     fclose(otimos_das_instancias);
 }
@@ -204,12 +197,40 @@ void BateriaDeTestes::run(int instance_size)
 	runRefactored(mq, generalSummary, instance_size);
 }
 
-
-
-void BateriaDeTestes::computeMeans()
+static int evaluateSequence(list<Sample> &seq, double time)
 {
-    
+    if(time < seq.begin()->time) return -1;
+    for(list<Sample>::iterator it = seq.begin(); it != seq.end(); ++it)
+    {
+        if(it->time >= time) return it->evaluation;
+    }
+    return seq.end()->evaluation;
 }
+
+static void computeMean(Queue<list<Sample>> &set, list<Sample> &mean)
+{
+    const int numberOfSamples = 1000;
+    int values[numberOfSamples] = {0};
+    
+
+
+    mean = set.pop();
+}
+
+void computeMeans(Summary *generalSummary)
+{
+#if 0
+    while(generalSummary->bvt.ifhaspop(generalSummary->meanBvt));
+    while(generalSummary->prsa.ifhaspop(generalSummary->meanPrsa));
+    while(generalSummary->sa.ifhaspop(generalSummary->meanSa));
+#else
+    computeMean(generalSummary->bvt, generalSummary->meanBvt);
+    computeMean(generalSummary->prsa, generalSummary->meanPrsa);
+    computeMean(generalSummary->sa, generalSummary->meanSa);
+#endif
+}
+
+
 
 
 

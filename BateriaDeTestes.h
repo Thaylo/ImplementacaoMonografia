@@ -29,7 +29,6 @@ namespace std {
 
 typedef struct
 {
-
     char target[200];
     int current_best;
     int id;

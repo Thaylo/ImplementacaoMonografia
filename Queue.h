@@ -62,6 +62,11 @@ class Queue
     return queue_.empty();
   }
   
+  int size()
+  {
+    return queue_.size();
+  }
+
   Queue()=default;
   Queue(const Queue&) = delete;            // disable copying
   Queue& operator=(const Queue&) = delete; // disable assignment

@@ -172,9 +172,7 @@ Solucao_dummy dstep_relinking(Solucao_dummy *src, Solucao_dummy *dest,double alf
 	Solucao_dummy *solucoes[MAX_JOBS];
 	for(int i = 0; i < cnt; i++)
 	{
-
 		solucoes[i] = geraVizinha(src,swaps[i][0],swaps[i][1]);
-
 	}
 
 	Solucao_dummy best = *(solucoes[0]);
