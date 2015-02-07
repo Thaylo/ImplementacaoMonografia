@@ -55,21 +55,21 @@ void dump_results_structured(int instance_size, char *instance_name, char *outpu
 	fprintf(fp,"v1 = [ ");
     for (Sample it : samples1 ) 
     {
-        fprintf(fp,"%d, %lf;\n",it.evaluation,it.time);
+        fprintf(fp,"%lf, %lf;\n",it.evaluation,it.time);
     }
 	fprintf(fp," ];\n");
 	
 	fprintf(fp,"v2 = [ ");
     for (Sample it : samples2 ) 
     {
-        fprintf(fp,"%d, %lf;\n",it.evaluation,it.time);
+        fprintf(fp,"%lf, %lf;\n",it.evaluation,it.time);
     }
 	fprintf(fp," ];\n");
 	
 	fprintf(fp,"v3 = [ ");
     for (Sample it : samples3 ) 
     {
-        fprintf(fp,"%d, %lf;\n",it.evaluation,it.time);
+        fprintf(fp,"%lf, %lf;\n",it.evaluation,it.time);
     }
 	fprintf(fp," ];\n");
 
@@ -158,8 +158,6 @@ Solucao_dummy dstep_relinking(Solucao_dummy *src, Solucao_dummy *dest,double alf
 			swaps[cnt][0] = i;
 			swaps[cnt][1] = j;
 
-			//printf("i%d | j%d\n",i,j);
-
 			cnt++;
 		}
 	}
@@ -168,7 +166,7 @@ Solucao_dummy dstep_relinking(Solucao_dummy *src, Solucao_dummy *dest,double alf
 		Solucao_dummy igual = *src;
 		return igual;
 	}
-	//printf("cnt = %d\n",cnt);
+    
 	Solucao_dummy *solucoes[MAX_JOBS];
 	for(int i = 0; i < cnt; i++)
 	{

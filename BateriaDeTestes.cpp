@@ -11,13 +11,116 @@ namespace std {
 
 BateriaDeTestes::BateriaDeTestes() {}
 
+static double evaluateAtTime(list<Sample> &ls, double time)
+{
+    double ret = 0;
+
+    if ( time <= ls.front().time )
+    {
+        return ls.front().evaluation;
+    }
+    else if ( time >= ls.back().time )
+    {
+        return ls.back().evaluation;
+    }
+    else
+    {
+        for (Sample s : ls)
+        {
+            if ( time >= s.time )
+            {
+                ret = s.evaluation;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
+static list<Sample> sumSamples(list<Sample> &A, list<Sample> &B)
+{
+    list<Sample> auxiliar;
+    list<Sample> final;
+
+    double minTime = max(A.front().time, B.front().time);
+    double maxTime = min(A.back().time, B.back().time);
+    
+    double currentTime = -1.0;
+    double oldTime = -1.0;
+    
+    list<Sample>::iterator ita = A.begin();
+    list<Sample>::iterator itb = B.begin();
+
+    while(ita != A.end() || itb != B.end() )
+    {
+        if (ita == A.end() )
+        {
+            auxiliar.push_back(*itb);
+            ++itb;
+        }
+        else if (itb == B.end())
+        {
+            auxiliar.push_back(*ita);
+            ++ita;
+        }
+        else
+        {
+            if( ita->time < itb->time )    
+            {
+                auxiliar.push_back(*ita);
+                ++ita;
+            }
+            else
+            {
+                auxiliar.push_back(*itb);
+                ++itb;
+            }
+        }
+    }
+
+    list<Sample>::iterator itaux = auxiliar.begin();
+    while( itaux->time < minTime )
+    {
+        ++itaux;
+    }
+    while(itaux != auxiliar.end() )
+    {
+        currentTime = itaux->time;
+        if(itaux->time > maxTime)
+        {
+            break;
+        }
+        if ( currentTime != oldTime )
+        {
+            Sample s;
+            s.time = itaux->time;
+            s.evaluation = evaluateAtTime(A, currentTime) + evaluateAtTime(B, currentTime);
+            final.push_back(s);
+            oldTime = currentTime;
+        }
+        ++itaux;
+    }
+    return final;
+}
+
+static void multiplyByConstant(list<Sample> &ls, double constant)
+{
+    for(list<Sample>::iterator it = ls.begin(); it != ls.end(); ++it)
+    {
+        it->evaluation *= constant;
+    }
+}
+
 void computeMeans(Summary *generalSummary);
 
 static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instance_size)
 {
     Task t;
-    const int repetitionToComputeMeans = 5;
-    
+    const int repetitionToComputeMeans = 50;
+    Summary localSummary;
     while(mq->ifhaspop(t))
     {
         char nome_da_instancia[300];
@@ -71,9 +174,6 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
             list<Sample> samplesBvt;
             list<Sample> samplesPrsa;
             list<Sample> samplesSa;
-
-            
-
         
             (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
                                                                                   &samplesBvt, bvt);
@@ -84,15 +184,17 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
             (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
                                                                                     &samplesSa, sa);
 
-            generalSummary->bvt.push(samplesBvt);
-            generalSummary->prsa.push(samplesPrsa);
-            generalSummary->sa.push(samplesSa);
+            localSummary.bvt.push(samplesBvt);
+            localSummary.prsa.push(samplesPrsa);
+            localSummary.sa.push(samplesSa);
 
         }
-        computeMeans(generalSummary);
+        #if 1
+        computeMeans(&localSummary);
         dump_results_structured(instance_size, target, outputImage, 
-                          generalSummary->meanBvt, generalSummary->meanPrsa, generalSummary->meanSa, 
+                          localSummary.meanBvt, localSummary.meanPrsa, localSummary.meanSa, 
                          (char*)"Vizinhanca simples por trocas 2 a 2", (char*)"PRSA", (char*) "SA");
+        #endif
     }
 
     printf("Job done\n");
@@ -149,7 +251,6 @@ static void runRefactored(Queue<Task> &mq, Summary &generalSummary, int instance
         printf("Erro, arquivos com tamanhos diferentes!!!\n");
         return;
     }
-    
 
     for(int i = 0; i < quantidade_nomes; i++)
     {
@@ -199,22 +300,97 @@ void BateriaDeTestes::run(int instance_size)
 
 static int evaluateSequence(list<Sample> &seq, double time)
 {
-    if(time < seq.begin()->time) return -1;
-    for(list<Sample>::iterator it = seq.begin(); it != seq.end(); ++it)
+    if(time < seq.begin()->time) 
     {
-        if(it->time >= time) return it->evaluation;
+        return seq.begin()->evaluation;
     }
-    return seq.end()->evaluation;
+    else
+    {
+        for(Sample s : seq)
+        {
+            if(s.time >= time)
+            {
+                return s.evaluation;
+            }
+        }
+        return seq.end()->evaluation;
+    }
+}   
+
+static void computeMaxMin(list< list <Sample> > &set, double *start, double *end)
+{
+    double tini = -1;
+    double tfim = -1;
+        
+    for(list<Sample> lss: set)
+    {
+        if ( -1 == tini )
+        {
+            tini = lss.begin()->time;
+        }
+        else if ( lss.begin()->time > tini )
+        {
+            tini = lss.begin()->time;
+        }
+
+        if ( -1 == tfim )
+        {
+            tfim = lss.back().time;
+        }
+        else if ( lss.back().time < tfim )
+        {
+            tfim = lss.back().time;
+        }
+    }
+    *end = tfim;
+    *start = tini;
 }
 
-static void computeMean(Queue<list<Sample>> &set, list<Sample> &mean)
+static void fillVectorWithEvaluations(list<Sample> &s, double *v, int szv,
+                                                                         double tstart, double tend)
+{
+    int i = 0;
+    for( double t = tstart; t <= tend; ) // TODO FIXME. t pode passar de tend antes da hora.
+    {
+        v[i] = evaluateSequence(s, t);
+        ++i;
+        t += (tend - tstart)/(szv-1);
+    }
+}
+
+static void computeMean(Queue<list<Sample>> &set, list<Sample> &sampleMean)
 {
     const int numberOfSamples = 1000;
-    int values[numberOfSamples] = {0};
+    double values[numberOfSamples] = {0};
+    double means[numberOfSamples] = {0};
+
+    double tstart, tend;
+
+    list<list<Sample>> set_cpy;
+    list<Sample> aux;
+    list<Sample> processedMean;
+
+    while(set.ifhaspop(aux))
+    {
+        set_cpy.push_back(aux);
+    }
     
+    int cnt = 0;
 
-
-    mean = set.pop();
+    for( list<Sample> s : set_cpy)
+    {
+        ++cnt;
+        if ( processedMean.size() == 0 )
+        {
+            processedMean = s;
+        }
+        else
+        {
+            processedMean = sumSamples(processedMean, s);
+        }
+    }
+    multiplyByConstant(processedMean, 1/(double)cnt);
+    sampleMean = processedMean;
 }
 
 void computeMeans(Summary *generalSummary)

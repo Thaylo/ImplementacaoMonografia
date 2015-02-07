@@ -7,7 +7,7 @@ namespace std {
 
 typedef struct
 {
-    int evaluation;
+    double evaluation;
     double time;
 } Sample;
 
