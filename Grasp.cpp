@@ -5,7 +5,7 @@ namespace std {
 
 void getCurrentFolder(char *bufferOut, int sizeBufferOut)
 {
-    const int MAX_PATH_LENGTH = 80;
+    const int MAX_PATH_LENGTH = 200;
     char path[MAX_PATH_LENGTH];
     
     char *ret = getcwd(path, MAX_PATH_LENGTH);
@@ -166,7 +166,7 @@ Solucao_dummy dstep_relinking(Solucao_dummy *src, Solucao_dummy *dest,double alf
 		Solucao_dummy igual = *src;
 		return igual;
 	}
-    
+
 	Solucao_dummy *solucoes[MAX_JOBS];
 	for(int i = 0; i < cnt; i++)
 	{
@@ -260,8 +260,6 @@ Solucao dpath_relinking(Solucao &a, Solucao &b, double alfa, double beta)
 	}
 }
 
-
-
 // Faz a ligação 2 a 2 de todas as soluções do pool.
 Solucao path_relinking(list<Solucao> & pool, double alfa, double beta)
 {
@@ -316,12 +314,11 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
         /* Neste trabalho, a única situação em que não se utiliza o SA é na busca por vizinhança */
         if(bvt == set)
         {
-            construida = busca_local_iterada(construida,politica, construida.quantidadeTarefas(), 
-                                                                                        alfa, beta);
+            construida = busca_local_iterada(construida,politica, alfa, beta);
         }
         else
         {
-            construida = simulated_annealing(inst, 2.4, 80, 15, 0.8,alfa,beta,tipo_T);    
+            construida = simulated_annealing(inst, 3.0, 80, 55, 0.96,alfa,beta,tipo_T);    
         }
 		
 		double avaliacao_corrente = construida.avaliaSolucao(alfa,beta);

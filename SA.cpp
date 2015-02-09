@@ -35,9 +35,10 @@ Solucao simulated_annealing(Instancia *inst, double T0, int max_per_per_iter,
 	si = s;
 
 	double T = T0;
-	double Tf = 1e-9;
+	double Tf = 1e-10;
     // Sabendo a "temperatura" final desejada, o número maximo de iterações é conhecido.    
 	int max_iter = log(Tf/T0)/log(alfa_arref);
+
 	int nSuccess = 1;
 	int j = 0;
 	int i = 0;

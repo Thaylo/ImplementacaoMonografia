@@ -45,9 +45,9 @@ static list<Sample> sumSamples(list<Sample> &A, list<Sample> &B)
     list<Sample> auxiliar;
     list<Sample> final;
 
-    double minTime = max(A.front().time, B.front().time);
-    double maxTime = min(A.back().time, B.back().time);
-    
+    double minTime = min(A.front().time, B.front().time);
+    double maxTime = max(A.back().time, B.back().time);
+
     double currentTime = -1.0;
     double oldTime = -1.0;
     
@@ -119,7 +119,7 @@ void computeMeans(Summary *generalSummary);
 static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instance_size)
 {
     Task t;
-    const int repetitionToComputeMeans = 50;
+    const int repetitionToComputeMeans = 120;
     Summary localSummary;
     while(mq->ifhaspop(t))
     {
@@ -395,15 +395,9 @@ static void computeMean(Queue<list<Sample>> &set, list<Sample> &sampleMean)
 
 void computeMeans(Summary *generalSummary)
 {
-#if 0
-    while(generalSummary->bvt.ifhaspop(generalSummary->meanBvt));
-    while(generalSummary->prsa.ifhaspop(generalSummary->meanPrsa));
-    while(generalSummary->sa.ifhaspop(generalSummary->meanSa));
-#else
     computeMean(generalSummary->bvt, generalSummary->meanBvt);
     computeMean(generalSummary->prsa, generalSummary->meanPrsa);
     computeMean(generalSummary->sa, generalSummary->meanSa);
-#endif
 }
 
 

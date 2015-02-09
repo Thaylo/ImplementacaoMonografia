@@ -134,8 +134,7 @@ Solucao gera_vizinho_tipoT(Solucao &s, PoliticaDeAlocacao politica, double alfa,
 
 Solucao busca_local_recursiva(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta);
 
-Solucao busca_local_iterada(Solucao &s, PoliticaDeAlocacao politica, int tentativas, double alfa, 
-                                                                                       double beta);
+Solucao busca_local_iterada(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta);
 
 void construcao_solucao(Instancia *inst, Solucao &sequencia, double alfa, double beta, 
                                             PoliticaDeAlocacao politica, double alfa_aleatoriedade);

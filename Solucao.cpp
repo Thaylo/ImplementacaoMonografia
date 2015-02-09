@@ -642,14 +642,14 @@ Solucao busca_local(Solucao &s, PoliticaDeAlocacao politica, double alfa, double
 	}
 }
 
-Solucao busca_local_iterada(Solucao &s, PoliticaDeAlocacao politica, int tentativas, double alfa, 
+Solucao busca_local_iterada(Solucao &s, PoliticaDeAlocacao politica, double alfa, 
                                                                                         double beta)
 {
 	Solucao best,temp;
 	best = busca_local(s,politica,alfa,beta);
 	double melhor_avaliacao = best.avaliaSolucao(alfa,beta);
 	double current;
-	for(int i = 0; i < tentativas; i++)
+	for(;;)
 	{
 		//cout << "i = " << i << "\n";
 		temp = busca_local(best,politica,alfa,beta);
