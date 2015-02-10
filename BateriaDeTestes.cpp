@@ -120,7 +120,7 @@ void computeMeans(Summary *generalSummary);
 static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instance_size)
 {
     Task t;
-    const int repetitionToComputeMeans = 20;
+    const int repetitionToComputeMeans = 10;
     Summary localSummary;
     while(mq->ifhaspop(t))
     {
@@ -131,7 +131,7 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
         strcpy(nome_da_instancia,t.target);
         job_index = t.id;
 
-        int max_iter = 50;
+        int max_iter = 200;
         double alfa = 1;
         double beta = 50;
         char target[300] = "";
