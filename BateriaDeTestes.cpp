@@ -86,6 +86,7 @@ static list<Sample> sumSamples(list<Sample> &A, list<Sample> &B)
     {
         ++itaux;
     }
+
     while(itaux != auxiliar.end() )
     {
         currentTime = itaux->time;
@@ -119,7 +120,7 @@ void computeMeans(Summary *generalSummary);
 static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instance_size)
 {
     Task t;
-    const int repetitionToComputeMeans = 120;
+    const int repetitionToComputeMeans = 20;
     Summary localSummary;
     while(mq->ifhaspop(t))
     {
@@ -174,27 +175,30 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
             list<Sample> samplesBvt;
             list<Sample> samplesPrsa;
             list<Sample> samplesSa;
-        
-            (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
-                                                                                  &samplesBvt, bvt);
-
+            
+            if (instance_size != LARGE_SIZE)
+            {
+                (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, 
+                                                              alfa_aleatoriedade, &samplesBvt, bvt);
+            }
             (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
                                                                                 &samplesPrsa, prsa);
 
             (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
                                                                                     &samplesSa, sa);
 
-            localSummary.bvt.push(samplesBvt);
+            if (instance_size != LARGE_SIZE)
+            {
+                localSummary.bvt.push(samplesBvt);
+            }
             localSummary.prsa.push(samplesPrsa);
             localSummary.sa.push(samplesSa);
 
         }
-        #if 1
         computeMeans(&localSummary);
         dump_results_structured(instance_size, target, outputImage, 
                           localSummary.meanBvt, localSummary.meanPrsa, localSummary.meanSa, 
                          (char*)"Vizinhanca simples por trocas 2 a 2", (char*)"PRSA", (char*) "SA");
-        #endif
     }
 
     printf("Job done\n");

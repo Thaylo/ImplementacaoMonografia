@@ -12,7 +12,7 @@ typedef struct
 } Sample;
 
 
-void storeSample(list<Sample> *samples, int score, double time);
+void storeSample(list<Sample> *samples, double evaluation, double time);
 
 void displayStoredSamples(list<Sample> *samples);
 

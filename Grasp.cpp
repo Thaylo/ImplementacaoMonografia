@@ -52,33 +52,68 @@ void dump_results_structured(int instance_size, char *instance_name, char *outpu
 		printf("Nao foi possivel criar o arquivo %s. Abortando escrita...\n",path_to_save);
 		return;
 	}
-	fprintf(fp,"v1 = [ ");
-    for (Sample it : samples1 ) 
+
+    Sample prev;
+    if (instance_size != LARGE_SIZE)
     {
-        fprintf(fp,"%lf, %lf;\n",it.evaluation,it.time);
-    }
-	fprintf(fp," ];\n");
-	
-	fprintf(fp,"v2 = [ ");
+    	fprintf(fp,"v1 = [ ");
+        for (Sample it : samples1 ) 
+        {
+            if (it.time != samples1.front().time)
+            {
+                fprintf(fp,"%lf, %lf;\n",prev.evaluation,it.time);
+            }
+            fprintf(fp,"%lf, %lf;\n",it.evaluation,it.time);
+            prev = it;
+        }
+    	fprintf(fp," ];\n");
+	}
+
+    fprintf(fp,"v2 = [ ");
     for (Sample it : samples2 ) 
     {
+        if (it.time != samples2.front().time)
+        {
+            fprintf(fp,"%lf, %lf;\n",prev.evaluation,it.time);
+        }
         fprintf(fp,"%lf, %lf;\n",it.evaluation,it.time);
+        prev = it;
     }
-	fprintf(fp," ];\n");
+    fprintf(fp," ];\n");
 	
-	fprintf(fp,"v3 = [ ");
+    fprintf(fp,"v3 = [ ");
     for (Sample it : samples3 ) 
     {
+        if (it.time != samples3.front().time)
+        {
+            fprintf(fp,"%lf, %lf;\n",prev.evaluation,it.time);
+        }
         fprintf(fp,"%lf, %lf;\n",it.evaluation,it.time);
+        prev = it;
     }
-	fprintf(fp," ];\n");
+    fprintf(fp," ];\n");
 
-	fprintf(fp, "plot(v1(:,2),v1(:,1),'b',v2(:,2),v2(:,1),'r',v3(:,2),v3(:,1),'g');\nhold on\n");
+    if (instance_size != LARGE_SIZE)
+    {
+	   fprintf(fp, "plot(v1(:,2),v1(:,1),'b',v2(:,2),v2(:,1),'r',v3(:,2),v3(:,1),'g');\nhold on\n");
+    }
+    else
+    {
+        fprintf(fp, "plot(v2(:,2),v2(:,1),'r',v3(:,2),v3(:,1),'g');\nhold on\n");
+    }
+
 	fprintf(fp, "title(\"Evolucao da Solucao na Instancia %s\");\n",instance_name);
 	fprintf(fp, "xlabel(\"Tempo transcorrido [s]\");\n");
 	fprintf(fp, "ylabel(\"Avaliacao da solucao\");\n");
 	
-	fprintf(fp, "h = legend (\"%s\", \"%s\", \"%s\");\n",legenda1, legenda2, legenda3);
+    if (instance_size != LARGE_SIZE)
+    {
+        fprintf(fp, "h = legend (\"%s\", \"%s\", \"%s\");\n",legenda1, legenda2, legenda3);    
+    }
+    else
+    {
+        fprintf(fp, "h = legend (\"%s\", \"%s\");\n", legenda2, legenda3);  
+    }
 	fprintf(fp, "set (h, \'fontsize\', 12)\n");
 	
 	fprintf(fp,"print('%s.png')",output);  // Nome do arquivo: "output" + ".png"
@@ -310,6 +345,7 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
     
 	for(int cont = 0; cont < max_iter; cont++)
 	{
+        
 		construcao_solucao(inst,construida,alfa,beta,politica,alfa_aleatoriedade);
         /* Neste trabalho, a única situação em que não se utiliza o SA é na busca por vizinhança */
         if(bvt == set)
@@ -318,7 +354,7 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
         }
         else
         {
-            construida = simulated_annealing(inst, 3.0, 80, 55, 0.96,alfa,beta,tipo_T);    
+            construida = simulated_annealing(inst, 3.0, 80, 55, 0.96, alfa,beta,tipo_T);  
         }
 		
 		double avaliacao_corrente = construida.avaliaSolucao(alfa,beta);
@@ -338,11 +374,6 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
 			
             new_timer = clock();
             delta = (new_timer - start_time) / (double)CLOCKS_PER_SEC;
-            if (samples->size() != 0)
-            {
-                Sample previous = samples->back();
-                storeSample(samples, previous.evaluation, delta);    
-            }
             storeSample(samples, Zmin, delta); 
 		}
 	}
@@ -357,11 +388,6 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
     	    Zmin = ava;
             new_timer = clock();
             delta = (new_timer - start_time) / (double)CLOCKS_PER_SEC;
-            if (samples->size() != 0)
-            {
-                Sample previous = samples->back();
-                storeSample(samples, previous.evaluation, delta);    
-            }
             storeSample(samples, Zmin, delta); 
     	}
         melhor_solucao = s;
@@ -370,7 +396,6 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
     new_timer = clock();
     delta = (new_timer - start_time) / (double)CLOCKS_PER_SEC;
     storeSample(samples, Zmin, delta);
-    
 	return melhor_solucao;
 }
 

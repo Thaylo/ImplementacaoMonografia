@@ -8,7 +8,7 @@ static void displayOneSample(Sample &s)
     cout << s.evaluation << " " << s.time;
 }
 
-void storeSample(list<Sample> *samples, int evaluation, double time)
+void storeSample(list<Sample> *samples, double evaluation, double time)
 {
     Sample s = {evaluation,time};
     samples->push_back(s);

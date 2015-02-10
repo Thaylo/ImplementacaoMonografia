@@ -6,10 +6,13 @@ using namespace std;
 
 int main()
 {
-	BateriaDeTestes b;
-    
-	srand(time(NULL));
-	b.run(SMALL_SIZE);
+	BateriaDeTestes bSmall;
+    BateriaDeTestes bLarge;
+	
+    srand(time(NULL));
+	
+    bSmall.run(SMALL_SIZE);
+    bLarge.run(LARGE_SIZE);
 	printf("MAIN EXIT\n");
 
 	return 0;

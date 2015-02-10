@@ -630,7 +630,7 @@ Solucao busca_local(Solucao &s, PoliticaDeAlocacao politica, double alfa, double
 
 		}
 	}
-
+	
 	if(temp.avaliaSolucao(alfa,beta) > Zmin) // Reduz a quantidade de recursões!!!
 	{
 		// cout << "rec " << Zmin << "\n";
