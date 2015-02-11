@@ -29,7 +29,7 @@ double estimatedTimeToAcomplish2000iterationsWith40Resamples(char *operationMode
         return 0;
     }
     double delta = (end_time - start_time) / (double)CLOCKS_PER_SEC;
-    return delta * 50 * 40 / 3600.0;
+    return delta * 2000 * 16 / 3600.0;
 }
 
 static void runTests(char *operationMode)
@@ -42,7 +42,7 @@ static void runTests(char *operationMode)
         mode = LARGE_SIZE;
     }
 
-    b.run(mode,50,40);
+    b.run(mode,2000,16);
 }
 
 int main()
