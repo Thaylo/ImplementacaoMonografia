@@ -23,12 +23,28 @@ void getCurrentFolder(char *bufferOut, int sizeBufferOut)
     }
 }
 
+static double maxOfTree(double v1, double v2, double v3)
+{
+    double v = v1 > v2 ? v1 : v2;
+    v = v > v3 ? v : v3;
+    return v;
+}
+
+static double minOfTree(double v1, double v2, double v3)
+{
+    double v = v1 < v2 ? v1 : v2;
+    v = v < v3 ? v : v3;
+    return v;
+}
+
 void dump_results_structured(int instance_size, char *instance_name, char *output, 
                              list<Sample> &samples1, list<Sample> &samples2, list<Sample> &samples3,
-                                                     char* legenda1, char* legenda2, char *legenda3)
+                                                     char* legenda1, char* legenda2, char *legenda3,
+                                                                               int bestOfLiterature)
 {
     char aux[300];
     char path_to_save[100];
+    char *legenda4 = (char*) "Best of literature";
     
 	strcpy(aux,output);
 	strcat(aux,".m");
@@ -93,13 +109,22 @@ void dump_results_structured(int instance_size, char *instance_name, char *outpu
     }
     fprintf(fp," ];\n");
 
+    /* This vector marks the best known value  */
+    fprintf(fp,"v4 = [");
+    fprintf(fp,"%d, %lf;\n",bestOfLiterature, minOfTree(samples1.front().time,samples2.front().time,
+                                                                            samples3.front().time));
+
+    fprintf(fp,"%d, %lf;\n",bestOfLiterature, maxOfTree(samples1.back().time,samples2.back().time,
+                                                                             samples3.back().time));
+    fprintf(fp," ];\n");
+
     if (instance_size != LARGE_SIZE)
     {
-	   fprintf(fp, "plot(v1(:,2),v1(:,1),'b',v2(:,2),v2(:,1),'r',v3(:,2),v3(:,1),'g');\nhold on\n");
+	   fprintf(fp, "plot(v1(:,2),v1(:,1),'b',v2(:,2),v2(:,1),'r',v3(:,2), v3(:,1),'g', v4(:,2),v4(:,1),'y');\nhold on\n");
     }
     else
     {
-        fprintf(fp, "plot(v2(:,2),v2(:,1),'r',v3(:,2),v3(:,1),'g');\nhold on\n");
+        fprintf(fp, "plot(v2(:,2),v2(:,1),'r',v3(:,2),v3(:,1),'g',v4(:,2),v4(:,1),'y');\nhold on\n");
     }
 
 	fprintf(fp, "title(\"Evolucao da Solucao na Instancia %s\");\n",instance_name);
@@ -108,11 +133,12 @@ void dump_results_structured(int instance_size, char *instance_name, char *outpu
 	
     if (instance_size != LARGE_SIZE)
     {
-        fprintf(fp, "h = legend (\"%s\", \"%s\", \"%s\");\n",legenda1, legenda2, legenda3);    
+        fprintf(fp, "h = legend (\"%s\", \"%s\", \"%s\", \"%s\");\n",
+                                                            legenda1, legenda2, legenda3, legenda4);    
     }
     else
     {
-        fprintf(fp, "h = legend (\"%s\", \"%s\");\n", legenda2, legenda3);  
+        fprintf(fp, "h = legend (\"%s\", \"%s\", \"%s\");\n", legenda2, legenda3, legenda4);  
     }
 	fprintf(fp, "set (h, \'fontsize\', 12)\n");
 	

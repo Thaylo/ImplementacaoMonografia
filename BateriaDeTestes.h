@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <time.h>       /* clock_t, clock, CLOCKS_PER_SEC */
 #include "Queue.h"
+#include "AsyncIO.h"
+ 
 namespace std {
 
 typedef struct

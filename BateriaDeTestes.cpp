@@ -7,6 +7,9 @@
 
 #include "BateriaDeTestes.h"
 
+#define CSVHEADER "Instance Name, Method, Final mean evaluation, Latest Time, Best Literature Evaluation, Best Evaluation Achieved, Reduction %\n"
+const char csvHeader[] = CSVHEADER;
+
 namespace std {
 
 BateriaDeTestes::BateriaDeTestes() {}
@@ -117,13 +120,93 @@ static void multiplyByConstant(list<Sample> &ls, double constant)
 
 void computeMeans(Summary *generalSummary);
 
-static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instance_size)
+static void writeDoubleOnCSV(FILE *fp, void *value)
+{
+    fprintf(fp, "%lf, ", *(double*)value);
+}
+
+static void writeIntOnCSV(FILE *fp, void *value)
+{
+    fprintf(fp, "%d, ", *(int*)value);
+}
+
+static void createCsvTable(AsyncChannel *async)
+{
+    async->write((void*) CSVHEADER, NULL);
+}
+
+void replace(char *str, char old, char newc)
+{
+    int i = 0;
+    while( str[i] != '\0')
+    {
+        if(str[i] == old)
+        {
+            //cout << "Troquei " << old << " por " << newc << "\n"; 
+            str[i] = newc;
+        }
+        i++;
+    }
+}
+
+static void writeCsvLine(AsyncChannel *async, char *instanceName, double finalMean, double finalTime, 
+                                                                    int bestLiteratureEvaluation,
+                                                                    int bestEvaluationAchieved,
+                                                                    char *method)
+{
+    char buffer[1024] = "";
+    char bufferTmp[30];
+
+    
+    replace(instanceName, ';', '\'');
+    strcat(buffer, instanceName);
+    strcat(buffer, ",");
+
+    replace(method, ';', '\'');
+    strcat(buffer, method);
+    strcat(buffer, ",");
+
+    sprintf(bufferTmp, "%lf,", finalMean);
+    strcat(buffer, bufferTmp);
+
+    sprintf(bufferTmp, "%lf,", finalTime);
+    strcat(buffer, bufferTmp);
+
+    sprintf(bufferTmp, "%d,", bestLiteratureEvaluation);
+    strcat(buffer, bufferTmp);
+
+    sprintf(bufferTmp, "%d,", bestEvaluationAchieved);
+    strcat(buffer, bufferTmp);
+
+    if( bestEvaluationAchieved != -1 )
+    {
+        double percentualReduction = 
+                     100.0*(bestLiteratureEvaluation - bestEvaluationAchieved)/bestLiteratureEvaluation;
+
+        sprintf(bufferTmp, "%lf\n", percentualReduction);
+        strcat(buffer, bufferTmp);
+    }
+    else
+    {
+        sprintf(bufferTmp, "-\n");
+        strcat(buffer, bufferTmp);
+    }  
+    
+    async->write((void*)buffer, NULL);
+
+}
+
+static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instance_size, 
+                                                                                AsyncChannel *async)
 {
     Task t;
     const int repetitionToComputeMeans = 10;
     Summary localSummary;
     while(mq->ifhaspop(t))
     {
+        int bestEvaluationAchievedBVT, bestEvaluationAchievedSA, bestEvaluationAchievedPRSA;
+        bestEvaluationAchievedSA = bestEvaluationAchievedPRSA = bestEvaluationAchievedBVT = ZINF;
+
         char nome_da_instancia[300];
             
         int job_index;
@@ -131,7 +214,7 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
         strcpy(nome_da_instancia,t.target);
         job_index = t.id;
 
-        int max_iter = 200;
+        int max_iter = 20;
         double alfa = 1;
         double beta = 50;
         char target[300] = "";
@@ -180,12 +263,24 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
             {
                 (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, 
                                                               alfa_aleatoriedade, &samplesBvt, bvt);
+                if (samplesBvt.back().evaluation < bestEvaluationAchievedBVT)
+                {
+                    bestEvaluationAchievedBVT = samplesBvt.back().evaluation;
+                }
             }
             (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
                                                                                 &samplesPrsa, prsa);
+            if (samplesPrsa.back().evaluation < bestEvaluationAchievedPRSA)
+            {
+                bestEvaluationAchievedPRSA = samplesPrsa.back().evaluation;
+            }
 
             (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
                                                                                     &samplesSa, sa);
+            if (samplesSa.back().evaluation < bestEvaluationAchievedSA)
+            {
+                bestEvaluationAchievedSA = samplesSa.back().evaluation;
+            }
 
             if (instance_size != LARGE_SIZE)
             {
@@ -198,14 +293,53 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
         computeMeans(&localSummary);
         dump_results_structured(instance_size, target, outputImage, 
                           localSummary.meanBvt, localSummary.meanPrsa, localSummary.meanSa, 
-                         (char*)"Vizinhanca simples por trocas 2 a 2", (char*)"PRSA", (char*) "SA");
-    }
+                         (char*)"Trocas 2 a 2", (char*)"PRSA", (char*) "SA", t.current_best);
 
-    printf("Job done\n");
+        if (  ZINF == bestEvaluationAchievedBVT )
+        {
+            bestEvaluationAchievedBVT = -1;
+        }
+
+        writeCsvLine(async, nome_da_instancia, localSummary.meanBvt.back().evaluation, 
+                                                                localSummary.meanBvt.back().time, 
+                                                                t.current_best, // on literature
+                                                                bestEvaluationAchievedBVT,
+                                                                (char*)"Trocas 2 a 2");
+
+        writeCsvLine(async, nome_da_instancia, localSummary.meanPrsa.back().evaluation, 
+                                                                localSummary.meanPrsa.back().time, 
+                                                                t.current_best, // on literature
+                                                                bestEvaluationAchievedPRSA,
+                                                                (char*)"PRSA");
+
+        writeCsvLine(async, nome_da_instancia, localSummary.meanSa.back().evaluation, 
+                                                                localSummary.meanSa.back().time, 
+                                                                t.current_best, // on literature
+                                                                bestEvaluationAchievedSA,
+                                                                (char*)"SA");
+    }
 }
 
 static void runRefactored(Queue<Task> &mq, Summary &generalSummary, int instance_size)
 {
+
+    char outputResultsTxt[200];
+    if( LARGE_SIZE == instance_size)
+    {
+        sprintf(outputResultsTxt,"%s", (char*) "resultsLarge.csv");
+    }
+    else if( SMALL_SIZE == instance_size)
+    {
+        sprintf(outputResultsTxt,"%s", (char*) "resultsSmall.csv");
+    }
+    else
+    {
+        printf("Invalid instance size\n");
+        return;
+    }
+
+    AsyncChannel async((const char *)outputResultsTxt);
+    createCsvTable(&async);
 
     static unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
     
@@ -281,11 +415,12 @@ static void runRefactored(Queue<Task> &mq, Summary &generalSummary, int instance
         mq.push(t);
     }
     
-    list<thread> myThreads;
     
+    list<thread> myThreads;
+
     for(int i = 0; i < (int) concurentThreadsSupported; i++)
     {
-        myThreads.push_back(thread(runOneInstance,&mq, &generalSummary, instance_size));
+        myThreads.push_back(thread(runOneInstance,&mq, &generalSummary, instance_size, &async));
     }
 
     for (list<thread>::iterator it = myThreads.begin(); it != myThreads.end(); ++it)

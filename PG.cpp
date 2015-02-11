@@ -1,6 +1,7 @@
 #include "BateriaDeTestes.h"
 #include "TimeSeries.h"
 #include "CommonDebug.h"
+#include "AsyncIO.h"
 
 #define ERR 0
 
@@ -38,6 +39,7 @@ int main()
         printf("CONFIG VALUE FAILURE\n");
         return 0;
     }
+
 
     printf("MAIN EXIT\n");
 	return 0;
