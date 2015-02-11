@@ -197,10 +197,10 @@ static void writeCsvLine(AsyncChannel *async, char *instanceName, double finalMe
 }
 
 static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instance_size, 
-                                                                                AsyncChannel *async)
+                              AsyncChannel *async, const int repetitionToComputeMeans, int max_iter)
 {
     Task t;
-    const int repetitionToComputeMeans = 10;
+    
     Summary localSummary;
     while(mq->ifhaspop(t))
     {
@@ -214,7 +214,7 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
         strcpy(nome_da_instancia,t.target);
         job_index = t.id;
 
-        int max_iter = 20;
+        
         double alfa = 1;
         double beta = 50;
         char target[300] = "";
@@ -320,7 +320,8 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
     }
 }
 
-static void runRefactored(Queue<Task> &mq, Summary &generalSummary, int instance_size)
+static void runRefactored(Queue<Task> &mq, Summary &generalSummary, int instance_size,
+                                                                    int repetitions, int iterations)
 {
 
     char outputResultsTxt[200];
@@ -420,7 +421,8 @@ static void runRefactored(Queue<Task> &mq, Summary &generalSummary, int instance
 
     for(int i = 0; i < (int) concurentThreadsSupported; i++)
     {
-        myThreads.push_back(thread(runOneInstance,&mq, &generalSummary, instance_size, &async));
+        myThreads.push_back(thread(runOneInstance,&mq, &generalSummary, instance_size, &async, 
+                                                                          repetitions, iterations));
     }
 
     for (list<thread>::iterator it = myThreads.begin(); it != myThreads.end(); ++it)
@@ -432,9 +434,9 @@ static void runRefactored(Queue<Task> &mq, Summary &generalSummary, int instance
     fclose(otimos_das_instancias);
 }
 
-void BateriaDeTestes::run(int instance_size)
+void BateriaDeTestes::run(int instance_size, int repetitions, int iterations)
 {
-	runRefactored(mq, generalSummary, instance_size);
+	runRefactored(mq, generalSummary, instance_size, repetitions, iterations);
 }
 
 static int evaluateSequence(list<Sample> &seq, double time)

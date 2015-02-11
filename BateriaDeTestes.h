@@ -26,7 +26,7 @@
 #include <time.h>       /* clock_t, clock, CLOCKS_PER_SEC */
 #include "Queue.h"
 #include "AsyncIO.h"
- 
+
 namespace std {
 
 typedef struct
@@ -57,7 +57,7 @@ public:
 
 	BateriaDeTestes();
 	
-	void run(int instance_size);
+	void run(int instance_size, int repetitions, int iterations);
     void computeMeans();
 	virtual ~BateriaDeTestes();
 };

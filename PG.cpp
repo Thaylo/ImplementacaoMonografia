@@ -3,44 +3,59 @@
 #include "CommonDebug.h"
 #include "AsyncIO.h"
 
-#define ERR 0
-
 using namespace std;
 
-int main()
+double estimatedTimeToAcomplish2000iterationsWith40Resamples(char *operationMode)
 {
-    char operationMode[30];
-    int rc = ERR;
-    FILE *fp = fopen("config.ini","r");
-
-    rc = fscanf(fp,"%s",operationMode);
-    fclose(fp);
-
-    if ( ERR == rc )
-    {
-        printf("CONFIG READ FAILURE\n");
-        return 0;
-    }
-
-	BateriaDeTestes b;
-	
+    BateriaDeTestes b;
+    
+    clock_t start_time = clock();    
+    clock_t end_time;
     srand(time(NULL));
-	
+    
     if(!strcmp(operationMode,"SMALL_SIZE"))
     {
-        b.run(SMALL_SIZE);    
+        b.run(SMALL_SIZE,1,1);    
+        end_time = clock(); 
     }
     else if(!strcmp(operationMode,"LARGE_SIZE"))
     {
-        b.run(LARGE_SIZE);  
+        b.run(LARGE_SIZE,1,1); 
+        end_time = clock(); 
     }
     else
     {
         printf("CONFIG VALUE FAILURE\n");
         return 0;
     }
+    double delta = (end_time - start_time) / (double)CLOCKS_PER_SEC;
+    return delta * 50 * 40 / 3600.0;
+}
 
+static void runTests(char *operationMode)
+{
+    BateriaDeTestes b;
+    int mode = SMALL_SIZE;
 
-    printf("MAIN EXIT\n");
-	return 0;
+    if(!strcmp(operationMode,"LARGE_SIZE"))
+    {
+        mode = LARGE_SIZE;
+    }
+
+    b.run(mode,50,40);
+}
+
+int main()
+{
+    srand(time(NULL));
+    double t = estimatedTimeToAcomplish2000iterationsWith40Resamples((char*)"SMALL_SIZE");
+    printf("Estimated time for small instances: %lf hours\n",t);
+
+    t = estimatedTimeToAcomplish2000iterationsWith40Resamples((char*)"LARGE_SIZE");
+    printf("Estimated time for large instances: %lf hours\n",t);
+
+    runTests((char*)"SMALL_SIZE");
+    runTests((char*)"LARGE_SIZE");
+	
+    return 0;
 }
