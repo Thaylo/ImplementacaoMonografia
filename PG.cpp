@@ -42,7 +42,7 @@ static void runTests(char *operationMode)
         mode = LARGE_SIZE;
     }
 
-    b.run(mode,2000,16);
+    b.run(mode,16,2000);
 }
 
 int main()
