@@ -384,7 +384,7 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
         }
         else
         {
-            construida = simulated_annealing(inst, 3.0, 80, 55, 0.96, alfa,beta,mista_aleatoria);  
+            construida = simulated_annealing(inst, 3.0, 80, 55, 0.96, alfa,beta, tipo_N);  
         }
 		
 		double avaliacao_corrente = construida.avaliaSolucao(alfa,beta);
