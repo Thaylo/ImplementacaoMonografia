@@ -8,6 +8,8 @@ const int iterations = 2000;
 
 using namespace std;
 
+
+#if 0
 double estimatedTimeToAcomplish(char *operationMode, int rep, int iter)
 {
     BateriaDeTestes b;
@@ -35,6 +37,7 @@ double estimatedTimeToAcomplish(char *operationMode, int rep, int iter)
     double delta = (end_time - start_time) / (double) CLOCKS_PER_SEC;
     return delta * (iterations*repetitions/(rep*iter)) / 3600.0;
 }
+#endif
 
 static void runTests(char *operationMode)
 {
@@ -52,14 +55,7 @@ static void runTests(char *operationMode)
 int main()
 {
     srand(time(NULL));
-    int iter = 4;
-    int rep = 4;
-    double t = estimatedTimeToAcomplish((char*)"SMALL_SIZE", iter, rep);
-    printf("Estimated time for small instances: %lf hours\n",t);
 
-    t = estimatedTimeToAcomplish((char*)"LARGE_SIZE", iter, rep);
-    printf("Estimated time for large instances: %lf hours\n",t);
-    
     runTests((char*)"SMALL_SIZE");
     runTests((char*)"LARGE_SIZE");
 	
