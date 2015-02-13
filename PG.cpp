@@ -55,7 +55,7 @@ static void runTests(char *operationMode)
 int main()
 {
     srand(time(NULL));
-
+    cout << "O sistema permite " << std::thread::hardware_concurrency() << " threads\n";
     runTests((char*)"SMALL_SIZE");
     runTests((char*)"LARGE_SIZE");
 	
