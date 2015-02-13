@@ -189,6 +189,8 @@ Solucao gera_vizinho_tipoT(Solucao &s, PoliticaDeAlocacao politica, double alfa,
 	}
 	else
 	{
+		assert( 0 != s.maquinas[maq1]->size() );
+
 		pos1 = rand()%s.maquinas[maq1]->size();
 	}
 
@@ -198,6 +200,7 @@ Solucao gera_vizinho_tipoT(Solucao &s, PoliticaDeAlocacao politica, double alfa,
 	}
 	else
 	{
+		assert( 0 != s.maquinas[maq2]->size());
 		pos2 = rand()%s.maquinas[maq2]->size();
 	}
 

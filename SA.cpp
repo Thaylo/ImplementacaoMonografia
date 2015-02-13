@@ -63,7 +63,9 @@ Solucao simulated_annealing(Instancia *inst, double T0, int max_per_per_iter,
 				}
 				case mista_aleatoria:
 				{
-					if(rand()%2 == 0)
+					int rand_value = rand();
+					
+					if(rand_value == 0 || rand_value % 2 == 0)
 						si = gera_vizinho_tipoN(s,politica,alfa,beta);
 					else
 						si = gera_vizinho_tipoT(s,politica,alfa,beta);
