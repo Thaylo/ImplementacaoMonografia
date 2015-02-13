@@ -421,7 +421,7 @@ static void runRefactored(Queue<Task> &mq, Summary &generalSummary, int instance
 
     for(int i = 0; i < (int) concurentThreadsSupported; i++)
     {
-        myThreads.push_back(thread(runOneInstance,&mq, &generalSummary, instance_size, &async, 
+        myThreads.push_back(thread(runOneInstance,&mq, &generalSummary, instance_size, &async,
                                                                           repetitions, iterations));
     }
 
