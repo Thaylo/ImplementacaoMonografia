@@ -288,6 +288,7 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
             }
             localSummary.prsa.push(samplesPrsa);
             localSummary.sa.push(samplesSa);
+            cout << "\t\tONE REPETITION COMPLETED!!!\n";
 
         }
         computeMeans(&localSummary);
@@ -317,6 +318,8 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
                                                                 t.current_best, // on literature
                                                                 bestEvaluationAchievedSA,
                                                                 (char*)"SA");
+
+        cout << "\tONE ROUND COMPLETED!!!\n";
     }
 }
 
@@ -485,18 +488,6 @@ static void computeMaxMin(list< list <Sample> > &set, double *start, double *end
     }
     *end = tfim;
     *start = tini;
-}
-
-static void fillVectorWithEvaluations(list<Sample> &s, double *v, int szv,
-                                                                         double tstart, double tend)
-{
-    int i = 0;
-    for( double t = tstart; t <= tend; ) // TODO FIXME. t pode passar de tend antes da hora.
-    {
-        v[i] = evaluateSequence(s, t);
-        ++i;
-        t += (tend - tstart)/(szv-1);
-    }
 }
 
 static void computeMean(Queue<list<Sample>> &set, list<Sample> &sampleMean)

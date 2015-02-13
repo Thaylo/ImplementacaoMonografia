@@ -3,7 +3,7 @@
 #include "CommonDebug.h"
 #include "AsyncIO.h"
 
-const int repetitions = 20;
+const int repetitions = 1;
 const int iterations = 2000;
 
 using namespace std;
