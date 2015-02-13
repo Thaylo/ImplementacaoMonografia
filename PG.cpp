@@ -3,11 +3,10 @@
 #include "CommonDebug.h"
 #include "AsyncIO.h"
 
-const int repetitions = 1;
-const int iterations = 2000;
+const int repetitions = 4;
+const int iterations = 500;
 
 using namespace std;
-
 
 #if 0
 double estimatedTimeToAcomplish(char *operationMode, int rep, int iter)
