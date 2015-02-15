@@ -251,7 +251,7 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
         //Solucao sdjasa = djasa(&inst,averageRec,alfa,beta);
         //double ava_djasa = sdjasa.avaliaSolucao(alfa,beta);
 
-        double alfa_aleatoriedade = 0.8;
+        double alfa_aleatoriedade = 0.5;
 
         for( int count = 0; count < repetitionToComputeMeans; ++count)
         {
@@ -288,7 +288,7 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
             }
             localSummary.prsa.push(samplesPrsa);
             localSummary.sa.push(samplesSa);
-            cout << "\t\tONE REPETITION COMPLETED!!!\n";
+            //cout << "\t\tONE REPETITION COMPLETED!!!\n";
 
         }
         computeMeans(&localSummary);
@@ -319,11 +319,12 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
                                                                 bestEvaluationAchievedSA,
                                                                 (char*)"SA");
 
-        cout << "\tONE ROUND COMPLETED!!!\n";
+        //cout << "\tONE ROUND COMPLETED!!!\n";
     }
 }
 
 static void runRefactored(Queue<Task> &mq, Summary &generalSummary, int instance_size,
+                                                                    int firstIndex, int lastIndex, 
                                                                     int repetitions, int iterations)
 {
 
@@ -416,7 +417,12 @@ static void runRefactored(Queue<Task> &mq, Summary &generalSummary, int instance
         t.id = i;
         strcpy(t.target,target);
         t.current_best = current_best;
-        mq.push(t);
+
+        if (i >= firstIndex-1 && i <= lastIndex-1)
+        {
+            mq.push(t);
+        }
+        
     }
     
     
@@ -437,9 +443,11 @@ static void runRefactored(Queue<Task> &mq, Summary &generalSummary, int instance
     fclose(otimos_das_instancias);
 }
 
-void BateriaDeTestes::run(int instance_size, int repetitions, int iterations)
+void BateriaDeTestes::run(int instance_size, int firstIndex, int lastIndex, 
+                                                                    int repetitions, int iterations)
 {
-	runRefactored(mq, generalSummary, instance_size, repetitions, iterations);
+	runRefactored(mq, generalSummary, instance_size, firstIndex, lastIndex, 
+                                                                           repetitions, iterations);
 }
 
 static int evaluateSequence(list<Sample> &seq, double time)
@@ -531,10 +539,6 @@ void computeMeans(Summary *generalSummary)
     computeMean(generalSummary->prsa, generalSummary->meanPrsa);
     computeMean(generalSummary->sa, generalSummary->meanSa);
 }
-
-
-
-
 
 BateriaDeTestes::~BateriaDeTestes() {
 }

@@ -26,6 +26,7 @@ class Queue
   void pop(T& item)
   {
     std::unique_lock<std::mutex> mlock(mutex_);
+
     while (queue_.empty())
     {
       cond_.wait(mlock);
@@ -37,6 +38,7 @@ class Queue
   bool ifhaspop(T& item)
   {
     std::unique_lock<std::mutex> mlock(mutex_);
+
     if (!queue_.empty())
     {
         item = queue_.front();
@@ -66,6 +68,8 @@ class Queue
   {
     return queue_.size();
   }
+
+
 
   Queue()=default;
   Queue(const Queue&) = delete;            // disable copying

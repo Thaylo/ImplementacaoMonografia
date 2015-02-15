@@ -57,7 +57,7 @@ public:
 
 	BateriaDeTestes();
 	
-	void run(int instance_size, int repetitions, int iterations);
+	void run(int instance_size, int firstIndex, int lastIndex, int repetitions, int iterations);
     void computeMeans();
 	virtual ~BateriaDeTestes();
 };

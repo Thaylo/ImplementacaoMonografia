@@ -1,5 +1,5 @@
 #!/bin/bash
-mkdir instances
+mkdir -p instances
 cd instances
 rm * -rf
 wget https://www.dropbox.com/sh/aai7wvj2dhvqxz2/AADVpJkL9EA54yJWrsnK5q0ma?dl=1

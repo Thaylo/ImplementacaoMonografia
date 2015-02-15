@@ -144,8 +144,8 @@ void dump_results_structured(int instance_size, char *instance_name, char *outpu
 	
 	fprintf(fp,"print('%s.png')",output);  // Nome do arquivo: "output" + ".png"
 	fclose(fp);
-    cout << "\t\tdump_results_structured PERFORMED on "; 
-    printf("%s\n",path_to_save);
+    //cout << "dump_results_structured PERFORMED on "; 
+    //printf("%s\n\n",path_to_save);
 }
 
 int sol2vec(Solucao &s, int *v, int max_size)
@@ -374,7 +374,7 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
 	for(int cont = 0; cont < max_iter; cont++)
 	{
         if (0 != cont && 0 == (cont+1)%100)
-        cout << "\t\t\tIteration " << cont+1 << " on grasp\n";
+        //cout << "\t\t\tIteration " << cont+1 << " on grasp\n";
 
 		construcao_solucao(inst,construida,alfa,beta,politica,alfa_aleatoriedade);
         /* Neste trabalho, a única situação em que não se utiliza o SA é na busca por vizinhança */
@@ -426,7 +426,7 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
     new_timer = clock();
     delta = (new_timer - start_time) / (double)CLOCKS_PER_SEC;
     storeSample(samples, Zmin, delta);
-    cout << "||||||||||||||||One GRASP COMPLETED||||||||||||||||\n";
+    //cout << "||||||||||||||||One GRASP COMPLETED||||||||||||||||\n";
 	return melhor_solucao;
 }
 
