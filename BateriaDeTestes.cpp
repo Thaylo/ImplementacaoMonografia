@@ -259,15 +259,14 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
             list<Sample> samplesPrsa;
             list<Sample> samplesSa;
             
-            if (instance_size != LARGE_SIZE)
+            
+            (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, 
+                                                          alfa_aleatoriedade, &samplesBvt, bvt);
+            if (samplesBvt.back().evaluation < bestEvaluationAchievedBVT)
             {
-                (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, 
-                                                              alfa_aleatoriedade, &samplesBvt, bvt);
-                if (samplesBvt.back().evaluation < bestEvaluationAchievedBVT)
-                {
-                    bestEvaluationAchievedBVT = samplesBvt.back().evaluation;
-                }
+                bestEvaluationAchievedBVT = samplesBvt.back().evaluation;
             }
+
             (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
                                                                                 &samplesPrsa, prsa);
             if (samplesPrsa.back().evaluation < bestEvaluationAchievedPRSA)
@@ -282,10 +281,7 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
                 bestEvaluationAchievedSA = samplesSa.back().evaluation;
             }
 
-            if (instance_size != LARGE_SIZE)
-            {
-                localSummary.bvt.push(samplesBvt);
-            }
+            localSummary.bvt.push(samplesBvt);  
             localSummary.prsa.push(samplesPrsa);
             localSummary.sa.push(samplesSa);
             //cout << "\t\tONE REPETITION COMPLETED!!!\n";
@@ -295,11 +291,6 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
         dump_results_structured(instance_size, target, outputImage, 
                           localSummary.meanBvt, localSummary.meanPrsa, localSummary.meanSa, 
                          (char*)"Trocas 2 a 2", (char*)"PRSA", (char*) "SA", t.current_best);
-
-        if (  ZINF == bestEvaluationAchievedBVT )
-        {
-            bestEvaluationAchievedBVT = -1;
-        }
 
         writeCsvLine(async, nome_da_instancia, localSummary.meanBvt.back().evaluation, 
                                                                 localSummary.meanBvt.back().time, 
@@ -319,7 +310,6 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
                                                                 bestEvaluationAchievedSA,
                                                                 (char*)"SA");
 
-        //cout << "\tONE ROUND COMPLETED!!!\n";
     }
 }
 

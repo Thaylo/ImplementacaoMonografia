@@ -70,20 +70,19 @@ void dump_results_structured(int instance_size, char *instance_name, char *outpu
 	}
 
     Sample prev;
-    if (instance_size != LARGE_SIZE)
+    
+	fprintf(fp,"v1 = [ ");
+    for (Sample it : samples1 ) 
     {
-    	fprintf(fp,"v1 = [ ");
-        for (Sample it : samples1 ) 
+        if (it.time != samples1.front().time)
         {
-            if (it.time != samples1.front().time)
-            {
-                fprintf(fp,"%lf, %lf;\n",prev.evaluation,it.time);
-            }
-            fprintf(fp,"%lf, %lf;\n",it.evaluation,it.time);
-            prev = it;
+            fprintf(fp,"%lf, %lf;\n",prev.evaluation,it.time);
         }
-    	fprintf(fp," ];\n");
-	}
+        fprintf(fp,"%lf, %lf;\n",it.evaluation,it.time);
+        prev = it;
+    }
+	fprintf(fp," ];\n");
+
 
     fprintf(fp,"v2 = [ ");
     for (Sample it : samples2 ) 
@@ -118,28 +117,17 @@ void dump_results_structured(int instance_size, char *instance_name, char *outpu
                                                                              samples3.back().time));
     fprintf(fp," ];\n");
 
-    if (instance_size != LARGE_SIZE)
-    {
-	   fprintf(fp, "plot(v1(:,2),v1(:,1),'b',v2(:,2),v2(:,1),'r',v3(:,2), v3(:,1),'g', v4(:,2),v4(:,1),'y');\nhold on\n");
-    }
-    else
-    {
-        fprintf(fp, "plot(v2(:,2),v2(:,1),'r',v3(:,2),v3(:,1),'g',v4(:,2),v4(:,1),'y');\nhold on\n");
-    }
+    fprintf(fp, "plot(v1(:,2),v1(:,1),'b',v2(:,2),v2(:,1),'r',v3(:,2), v3(:,1),'g', v4(:,2),v4(:,1),'y');\nhold on\n");
+    
 
 	fprintf(fp, "title(\"Evolucao da Solucao na Instancia %s\");\n",instance_name);
 	fprintf(fp, "xlabel(\"Tempo transcorrido [s]\");\n");
 	fprintf(fp, "ylabel(\"Avaliacao da solucao\");\n");
 	
-    if (instance_size != LARGE_SIZE)
-    {
-        fprintf(fp, "h = legend (\"%s\", \"%s\", \"%s\", \"%s\");\n",
+   
+    fprintf(fp, "h = legend (\"%s\", \"%s\", \"%s\", \"%s\");\n",
                                                             legenda1, legenda2, legenda3, legenda4);    
-    }
-    else
-    {
-        fprintf(fp, "h = legend (\"%s\", \"%s\", \"%s\");\n", legenda2, legenda3, legenda4);  
-    }
+   
 	fprintf(fp, "set (h, \'fontsize\', 12)\n");
 	
 	fprintf(fp,"print('%s.png')",output);  // Nome do arquivo: "output" + ".png"
