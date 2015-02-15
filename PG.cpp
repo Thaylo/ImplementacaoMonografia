@@ -3,7 +3,7 @@
 #include "CommonDebug.h"
 #include "AsyncIO.h"
 
-int repetitions = 20;
+int repetitions = 10;
 int iterations = 2000;
 int firstInstanceIndex = 1;
 int lastInstanceIndex = 360;
@@ -59,9 +59,9 @@ static void runTests(char *operationMode)
     isso significa que o programa nao falou mizeravelmente.
 
     Para executar o verdadeiro teste, rode com os parametros:
-    ./teste INICIO FIM 20 2000 LARGE
+    ./teste INICIO FIM 10 2000 LARGE
     e
-    ./teste INICIO FIM 20 2000 SMALL
+    ./teste INICIO FIM 10 2000 SMALL
     onde INICIO e FIM sao os indices no range 1:360 das tarefas.
     Lembre-se que os testes SMALL serao muito mais rapidos.
 
