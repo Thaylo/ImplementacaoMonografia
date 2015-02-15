@@ -17,7 +17,7 @@ public:
 
     AsyncChannel( const char *filename )
     {
-        fileDescriptor = fopen( filename, "w");
+        fileDescriptor = fopen( filename, "a");
     }
 
     void read( void *data, void (*readFunc)(FILE *, void *) )
