@@ -361,8 +361,10 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
     
 	for(int cont = 0; cont < max_iter; cont++)
 	{
+        /*
         if (0 != cont && 0 == (cont+1)%100)
-        //cout << "\t\t\tIteration " << cont+1 << " on grasp\n";
+            cout << "\t\t\tIteration " << cont+1 << " on grasp\n";
+        */
 
 		construcao_solucao(inst,construida,alfa,beta,politica,alfa_aleatoriedade);
         /* Neste trabalho, a única situação em que não se utiliza o SA é na busca por vizinhança */
