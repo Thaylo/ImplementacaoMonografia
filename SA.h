@@ -16,7 +16,7 @@ using namespace std;
 
 typedef enum
 {
-	tipo_N,
+	tipo_R,
 	tipo_T,
 	mista_aleatoria
 } vizinhanca_sa;

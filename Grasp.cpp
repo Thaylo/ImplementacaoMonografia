@@ -42,12 +42,13 @@ static double minOfTree(double v1, double v2, double v3)
 void dump_results_structured(int instance_size, char *instance_name, char *output, 
                              list<Sample> &samples1, list<Sample> &samples2, list<Sample> &samples3,
                                                      char* legenda1, char* legenda2, char *legenda3,
-                                                                               int bestOfLiterature)
+                                                                    int bestOfLiterature, int djasa)
 {
     char aux[300];
     char path_to_save[100];
     char *legenda4 = (char*) "Best of literature";
-    
+    char *legenda5 = (char*) "DJASA";
+
 	strcpy(aux,output);
 	strcat(aux,".m");
 	getCurrentFolder(path_to_save, sizeof(path_to_save));
@@ -119,7 +120,16 @@ void dump_results_structured(int instance_size, char *instance_name, char *outpu
                                                                              samples3.back().time));
     fprintf(fp," ];\n");
 
-    fprintf(fp, "plot(v1(:,2),v1(:,1),'b',v2(:,2),v2(:,1),'r',v3(:,2), v3(:,1),'g', v4(:,2),v4(:,1),'y');\nhold on\n");
+    /* This vector marks the djasa value  */
+    fprintf(fp,"v5 = [");
+    fprintf(fp,"%d, %lf;\n", djasa, minOfTree(samples1.front().time,samples2.front().time,
+                                                                            samples3.front().time));
+
+    fprintf(fp,"%d, %lf;\n", djasa, maxOfTree(samples1.back().time,samples2.back().time,
+                                                                             samples3.back().time));
+    fprintf(fp," ];\n");
+
+    fprintf(fp, "plot(v1(:,2),v1(:,1),'b',v2(:,2),v2(:,1),'r',v3(:,2), v3(:,1),'g', v4(:,2),v4(:,1),'y', v5(:,2),v5(:,1),'c');\nhold on\n");
     
 
 	fprintf(fp, "title(\"Evolucao da Solucao na Instancia %s\");\n",instance_name);
@@ -127,8 +137,8 @@ void dump_results_structured(int instance_size, char *instance_name, char *outpu
 	fprintf(fp, "ylabel(\"Avaliacao da solucao\");\n");
 	
    
-    fprintf(fp, "h = legend (\"%s\", \"%s\", \"%s\", \"%s\");\n",
-                                                            legenda1, legenda2, legenda3, legenda4);    
+    fprintf(fp, "h = legend (\"%s\", \"%s\", \"%s\", \"%s\", \"%s\");\n",
+                                                  legenda1, legenda2, legenda3, legenda4, legenda5);    
    
 	fprintf(fp, "set (h, \'fontsize\', 12)\n");
 	
@@ -386,7 +396,7 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
 
         if (progress - old_progress > 0.5)
         {
-            for(int i = 0; i < progress/10; ++i)
+            for(int i = 0; i < progress/20; ++i)
             {
                 cout << ".";
             }
@@ -397,11 +407,11 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
         /* Neste trabalho, a única situação em que não se utiliza o SA é na busca por vizinhança */
         if(hc == set)
         {
-            construida = busca_local_iterada(construida,politica, alfa, beta);
+            construida = hill_climbing(construida,politica, alfa, beta);
         }
         else
         {
-            construida = simulated_annealing(inst, 1.5, 40, 15, 0.95, alfa,beta, tipo_N);  
+            construida = simulated_annealing(inst, 1.5, 40, 15, 0.95, alfa,beta, tipo_R);  
         }
 
         if( prsa == set )

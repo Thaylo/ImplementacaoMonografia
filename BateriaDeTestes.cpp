@@ -288,9 +288,15 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
 
         }
         computeMeans(&localSummary);
+
+        Solucao djsasaSolution = djasa(&inst, averageRec, alfa, beta );
+        double avaDjasa = djsasaSolution.avaliaSolucao(alfa,beta);
+        cout << "Ava djasa: " << avaDjasa << "\n";
+
         dump_results_structured(instance_size, target, outputImage, 
                           localSummary.meanHc, localSummary.meanPrsa, localSummary.meanSa, 
-                         (char*)"Hill Climbing", (char*)"PRSA", (char*) "SA", t.current_best);
+                         (char*)"Hill Climbing", (char*)"PRSA", (char*) "SA", t.current_best, 
+                                                                                          avaDjasa);
 
         writeCsvLine(async, nome_da_instancia, localSummary.meanHc.back().evaluation, 
                                                                 localSummary.meanHc.back().time, 

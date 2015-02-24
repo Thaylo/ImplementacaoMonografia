@@ -50,8 +50,8 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
 
 void dump_results_structured(int instance_size, char *instance_name, char *output, 
                              list<Sample> &samples1, list<Sample> &samples2, list<Sample> &samples3,
-                                                    char* legenda1, char* legenda2, char *legenda3,
-                                                                              int bestOfLiterature);
+                                                     char* legenda1, char* legenda2, char *legenda3,
+                                                                   int bestOfLiterature, int djasa);
 
 } // End namespace
 #endif /* GRASP_H_ */

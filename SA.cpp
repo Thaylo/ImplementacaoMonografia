@@ -51,9 +51,9 @@ Solucao simulated_annealing(Instancia *inst, double T0, int max_per_per_iter,
 
 			switch(vizinhanca)
 			{
-				case tipo_N:
+				case tipo_R:
 				{
-					si = gera_vizinho_tipoN(s,politica,alfa,beta);
+					si = gera_vizinho_tipoR(s,politica,alfa,beta);
 					break;
 				}
 				case tipo_T:
@@ -66,7 +66,7 @@ Solucao simulated_annealing(Instancia *inst, double T0, int max_per_per_iter,
 					int rand_value = rand();
 					
 					if(rand_value == 0 || rand_value % 2 == 0)
-						si = gera_vizinho_tipoN(s,politica,alfa,beta);
+						si = gera_vizinho_tipoR(s,politica,alfa,beta);
 					else
 						si = gera_vizinho_tipoT(s,politica,alfa,beta);
 					break;

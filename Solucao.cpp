@@ -211,7 +211,7 @@ Solucao gera_vizinho_tipoT(Solucao &s, PoliticaDeAlocacao politica, double alfa,
 	return nova;
 }
 
-Solucao gera_vizinho_tipoN(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta)
+Solucao gera_vizinho_tipoR(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta)
 {
 	Solucao temp;
 	temp = s;
@@ -271,68 +271,6 @@ Solucao gera_vizinho_tipoN(Solucao &s, PoliticaDeAlocacao politica, double alfa,
 	insere_job_solucao(solucao_sorteada,job_sorteado,maquina_sorteada,posicao_sorteada,alfa,beta);
 
 	return solucao_sorteada;
-}
-
-Solucao busca_local_recursiva(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta)
-{
-	Solucao temp;
-	temp = s;
-
-	list<Solucao> vizinhanca_retirada;
-	list<Job> tarefas_retiradas;
-	list<Solucao> vizinhanca_completa;
-
-	Solucao temp_aux;
-	for(int i = 0; i < temp.quantidadeMaquinas(); i++)
-	{
-		for(list<Job>::iterator it = temp.maquinas[i]->begin(); it != temp.maquinas[i]->end(); it++)
-		{
-			temp_aux = temp;
-			tarefas_retiradas.push_back(*it);
-			temp_aux.retiraTarefa(it->id,i);
-			vizinhanca_retirada.push_back(temp_aux);
-		}
-	}
-	// Neste ponto, tenho várias soluções que carecem de reinserção.
-	double Zmin = 9999999;
-	Solucao melhor_solucao;
-	for(list<Job>::iterator job_it = tarefas_retiradas.begin(); job_it != tarefas_retiradas.end(); 
-	                                                                                       job_it++)
-	{
-		for(list<Solucao>::iterator sol_it = vizinhanca_retirada.begin(); 
-		                                              sol_it != vizinhanca_retirada.end(); sol_it++)
-		{
-			Solucao aux;
-			aux = *sol_it;
-			for(int maq = 0; maq < aux.quantidadeMaquinas(); maq++)
-			{
-				for(int pos = 0; pos < (int) aux.maquinas[maq]->size()+1; pos++)
-				{
-					if(aux.jaEscalonada(job_it->id)) continue;
-					insere_job_solucao(aux,*job_it, maq, pos, alfa, beta);
-					otimiza_recursos(aux,alfa,beta);
-					double avaliacao_corrente = aux.avaliaSolucao(alfa,beta);
-					if(avaliacao_corrente < Zmin)
-					{
-						Zmin = avaliacao_corrente;
-						melhor_solucao = aux;
-					}
-					aux = *sol_it;
-				}
-			}
-
-		}
-	}
-
-	if(temp.avaliaSolucao(alfa,beta) > Zmin) // Reduz a quantidade de recursões!!!
-	{
-		// cout << "rec " << Zmin << "\n";
-		return busca_local_recursiva(melhor_solucao,politica,alfa,beta);
-	}
-	else
-	{
-		return temp;
-	}
 }
 
 Solucao swap_jobs(Solucao &s, int maq1, int job1, int maq2, int job2)
@@ -583,7 +521,7 @@ void exibe_pool(list<Solucao> & pool)
 
 
 
-Solucao busca_local(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta)
+Solucao best_near(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta)
 {
 	Solucao temp;
 	temp = s;
@@ -645,17 +583,17 @@ Solucao busca_local(Solucao &s, PoliticaDeAlocacao politica, double alfa, double
 	}
 }
 
-Solucao busca_local_iterada(Solucao &s, PoliticaDeAlocacao politica, double alfa, 
+Solucao hill_climbing(Solucao &s, PoliticaDeAlocacao politica, double alfa, 
                                                                                         double beta)
 {
 	Solucao best,temp;
-	best = busca_local(s,politica,alfa,beta);
+	best = best_near(s,politica,alfa,beta);
 	double melhor_avaliacao = best.avaliaSolucao(alfa,beta);
 	double current;
 	for(;;)
 	{
 		//cout << "i = " << i << "\n";
-		temp = busca_local(best,politica,alfa,beta);
+		temp = best_near(best,politica,alfa,beta);
 		current = temp.avaliaSolucao(alfa,beta);
 		if(current < melhor_avaliacao)
 		{

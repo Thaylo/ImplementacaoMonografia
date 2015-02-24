@@ -126,15 +126,13 @@ Solucao path_relinking(list<Solucao> & pool, double alfa, double beta);
 
 Solucao swap_jobs(Solucao &s, int maq1, int job1, int maq2, int job2);
 
-Solucao busca_local(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta);
+Solucao best_near(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta);
 
-Solucao gera_vizinho_tipoN(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta);
+Solucao gera_vizinho_tipoR(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta);
 
 Solucao gera_vizinho_tipoT(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta);
 
-Solucao busca_local_recursiva(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta);
-
-Solucao busca_local_iterada(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta);
+Solucao hill_climbing(Solucao &s, PoliticaDeAlocacao politica, double alfa, double beta);
 
 void construcao_solucao(Instancia *inst, Solucao &sequencia, double alfa, double beta, 
                                             PoliticaDeAlocacao politica, double alfa_aleatoriedade);
