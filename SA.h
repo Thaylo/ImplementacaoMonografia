@@ -24,7 +24,4 @@ typedef enum
 Solucao simulated_annealing(Instancia *inst, double T0, int max_per_per_iter, 
     int max_success_per_iter, double alfa_arref,double alfa, double beta, vizinhanca_sa vizinhanca);
     
-Solucao simulated_annealing_PR(Instancia *inst, double T0, int max_per_per_iter, 
-    int max_success_per_iter, double alfa_arref,double alfa, double beta, vizinhanca_sa vizinhanca);
-
 #endif /* SA_H_ */

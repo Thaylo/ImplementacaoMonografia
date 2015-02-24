@@ -204,8 +204,8 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
     Summary localSummary;
     while(mq->ifhaspop(t))
     {
-        int bestEvaluationAchievedBVT, bestEvaluationAchievedSA, bestEvaluationAchievedPRSA;
-        bestEvaluationAchievedSA = bestEvaluationAchievedPRSA = bestEvaluationAchievedBVT = ZINF;
+        int bestEvaluationAchievedHC, bestEvaluationAchievedSA, bestEvaluationAchievedPRSA;
+        bestEvaluationAchievedSA = bestEvaluationAchievedPRSA = bestEvaluationAchievedHC = ZINF;
 
         char nome_da_instancia[300];
             
@@ -255,16 +255,16 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
 
         for( int count = 0; count < repetitionToComputeMeans; ++count)
         {
-            list<Sample> samplesBvt;
+            list<Sample> samplesHc;
             list<Sample> samplesPrsa;
             list<Sample> samplesSa;
             
             
             (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, 
-                                                          alfa_aleatoriedade, &samplesBvt, bvt);
-            if (samplesBvt.back().evaluation < bestEvaluationAchievedBVT)
+                                                          alfa_aleatoriedade, &samplesHc, hc);
+            if (samplesHc.back().evaluation < bestEvaluationAchievedHC)
             {
-                bestEvaluationAchievedBVT = samplesBvt.back().evaluation;
+                bestEvaluationAchievedHC = samplesHc.back().evaluation;
             }
 
             (void) grasp_with_setings(&inst, averageRec, alfa, beta, max_iter, alfa_aleatoriedade, 
@@ -281,7 +281,7 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
                 bestEvaluationAchievedSA = samplesSa.back().evaluation;
             }
 
-            localSummary.bvt.push(samplesBvt);  
+            localSummary.hc.push(samplesHc);  
             localSummary.prsa.push(samplesPrsa);
             localSummary.sa.push(samplesSa);
             //cout << "\t\tONE REPETITION COMPLETED!!!\n";
@@ -289,14 +289,14 @@ static void runOneInstance(Queue<Task> *mq, Summary *generalSummary, int instanc
         }
         computeMeans(&localSummary);
         dump_results_structured(instance_size, target, outputImage, 
-                          localSummary.meanBvt, localSummary.meanPrsa, localSummary.meanSa, 
-                         (char*)"Trocas 2 a 2", (char*)"PRSA", (char*) "SA", t.current_best);
+                          localSummary.meanHc, localSummary.meanPrsa, localSummary.meanSa, 
+                         (char*)"Hill Climbing", (char*)"PRSA", (char*) "SA", t.current_best);
 
-        writeCsvLine(async, nome_da_instancia, localSummary.meanBvt.back().evaluation, 
-                                                                localSummary.meanBvt.back().time, 
+        writeCsvLine(async, nome_da_instancia, localSummary.meanHc.back().evaluation, 
+                                                                localSummary.meanHc.back().time, 
                                                                 t.current_best, // on literature
-                                                                bestEvaluationAchievedBVT,
-                                                                (char*)"Trocas 2 a 2");
+                                                                bestEvaluationAchievedHC,
+                                                                (char*)"Hill Climbing");
 
         writeCsvLine(async, nome_da_instancia, localSummary.meanPrsa.back().evaluation, 
                                                                 localSummary.meanPrsa.back().time, 
@@ -490,10 +490,6 @@ static void computeMaxMin(list< list <Sample> > &set, double *start, double *end
 
 static void computeMean(Queue<list<Sample>> &set, list<Sample> &sampleMean)
 {
-    const int numberOfSamples = 1000;
-    double values[numberOfSamples] = {0};
-    double means[numberOfSamples] = {0};
-
     double tstart, tend;
 
     list<list<Sample>> set_cpy;
@@ -525,7 +521,7 @@ static void computeMean(Queue<list<Sample>> &set, list<Sample> &sampleMean)
 
 void computeMeans(Summary *generalSummary)
 {
-    computeMean(generalSummary->bvt, generalSummary->meanBvt);
+    computeMean(generalSummary->hc, generalSummary->meanHc);
     computeMean(generalSummary->prsa, generalSummary->meanPrsa);
     computeMean(generalSummary->sa, generalSummary->meanSa);
 }

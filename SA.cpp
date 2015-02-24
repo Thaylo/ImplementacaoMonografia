@@ -83,8 +83,6 @@ Solucao simulated_annealing(Instancia *inst, double T0, int max_per_per_iter,
 			if(DeltaFi < 0.0 || aux >= random_t())
 			{
 				s = si;
-				if(DeltaFi < 0.0)
-				//cout << "Z = " << current_eva << "\n";
 				nSuccess++;
 			}
 			i++;
@@ -101,82 +99,4 @@ Solucao simulated_annealing(Instancia *inst, double T0, int max_per_per_iter,
 		}
 	}
 	return s;
-}
-
-Solucao simulated_annealing_PR(Instancia *inst, double T0, 
-int max_per_per_iter, int max_success_per_iter, double alfa_arref,
-double alfa, double beta, vizinhanca_sa vizinhanca)
-{
-
-	list<Solucao> pool;
-	PoliticaDeAlocacao politica = averageRec;
-	Solucao s,si;
-	construcao_solucao(inst, s, alfa, beta, politica, 1);
-	alimenta_pool(pool,s,alfa,beta);
-	double T = T0;
-	double Tf = 1e-9;
-    // Sabendo a "temperatura" final desejada, o número maximo de iterações é conhecido.
-	int max_iter = log(Tf/T0)/log(alfa_arref);
-	int nSuccess = 1;
-	int j = 0;
-	int i = 0;
-	while(1)
-	{
-		i = 0;
-		nSuccess = 0;
-		while(1)
-		{
-
-			switch(vizinhanca)
-			{
-				case tipo_N:
-				{
-					si = gera_vizinho_tipoN(s,politica,alfa,beta);
-					break;
-				}
-				case tipo_T:
-				{
-					si = gera_vizinho_tipoT(s,politica,alfa,beta);
-					break;
-				}
-				case mista_aleatoria:
-				{
-					if(rand()%2 == 0)
-						si = gera_vizinho_tipoN(s,politica,alfa,beta);
-					else
-						si = gera_vizinho_tipoT(s,politica,alfa,beta);
-					break;
-				}
-			}
-			otimiza_recursos(si,alfa,beta);
-
-			//cout << "A partir de \n"<< s<<"foi gerado\n" << si << "\n";
-			double current_eva = si.avaliaSolucao(alfa,beta);
-
-			double DeltaFi = current_eva - s.avaliaSolucao(alfa,beta);
-			double aux = exp(-DeltaFi/T);
-
-			if(DeltaFi < 0.0 || aux >= random_t())
-			{
-				s = si;
-				if(DeltaFi < 0.0)
-				{
-					nSuccess++;
-					alimenta_pool(pool,si,alfa,beta);
-				}
-			}
-			i++;
-			if(nSuccess >= max_success_per_iter || i > max_per_per_iter)
-			{
-				break;
-			}
-		}
-		T *= alfa_arref;
-		j++;
-		if(nSuccess == 0 || j >= max_iter)
-		{
-			break;
-		}
-	}
-	return path_relinking(pool,alfa,beta);
 }

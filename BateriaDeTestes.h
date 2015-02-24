@@ -38,11 +38,11 @@ typedef struct
 
 typedef struct
 {
-    Queue<list<Sample>> bvt;
+    Queue<list<Sample>> hc;
     Queue<list<Sample>> prsa;
     Queue<list<Sample>> sa;
     
-    list<Sample> meanBvt;
+    list<Sample> meanHc;
     list<Sample> meanPrsa;
     list<Sample> meanSa;
 } Summary;

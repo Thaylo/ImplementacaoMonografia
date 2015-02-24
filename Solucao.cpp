@@ -532,7 +532,7 @@ void gera_caminho(Solucao &base, list<Solucao> &ls, int *v1, int *v2, int size, 
 void alimenta_pool(list<Solucao> &pool,Solucao &s, double alfa, double beta)
 {
 	otimiza_recursos(s,alfa,beta);
-	unsigned n = 20;
+	unsigned n = 5;
 	if(pool.size() == 0)
 	{
 		pool.push_back(s);

@@ -3,6 +3,8 @@
 
 namespace std {
 
+Solucao path_relinking(list<Solucao> & pool, Solucao &s, double alfa, double beta);
+
 void getCurrentFolder(char *bufferOut, int sizeBufferOut)
 {
     const int MAX_PATH_LENGTH = 200;
@@ -312,7 +314,23 @@ Solucao dpath_relinking(Solucao &a, Solucao &b, double alfa, double beta)
 }
 
 // Faz a ligação 2 a 2 de todas as soluções do pool.
-Solucao path_relinking(list<Solucao> & pool, double alfa, double beta)
+Solucao path_relinking(list<Solucao> & pool, Solucao &s, double alfa, double beta)
+{
+    Solucao melhor = s;
+    
+    for(list<Solucao>::iterator it1 = pool.begin(); it1 != pool.end(); it1++)
+    {
+        Solucao current = dpath_relinking(*it1, s, alfa, beta);
+        if(current.avaliaSolucao(alfa,beta) < melhor.avaliaSolucao(alfa,beta))
+        {
+            melhor = current;
+        }
+    }
+    return melhor;
+}
+
+// Faz a ligação 2 a 2 de todas as soluções do pool.
+Solucao path_relinking_pool(list<Solucao> & pool, double alfa, double beta)
 {
 	if(pool.size() == 1)
 	{
@@ -359,22 +377,36 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
     clock_t new_timer = start_time;
     double delta;
     
+    double progress = 0;
+    double old_progress = 0;
+    
 	for(int cont = 0; cont < max_iter; cont++)
 	{
-        /*
-        if (0 != cont && 0 == (cont+1)%100)
-            cout << "\t\t\tIteration " << cont+1 << " on grasp\n";
-        */
+        progress = 100*cont/(double)max_iter;
 
+        if (progress - old_progress > 0.5)
+        {
+            for(int i = 0; i < progress/10; ++i)
+            {
+                cout << ".";
+            }
+            cout << " " << progress << " percent\n";
+        }    
+        
 		construcao_solucao(inst,construida,alfa,beta,politica,alfa_aleatoriedade);
         /* Neste trabalho, a única situação em que não se utiliza o SA é na busca por vizinhança */
-        if(bvt == set)
+        if(hc == set)
         {
             construida = busca_local_iterada(construida,politica, alfa, beta);
         }
         else
         {
-            construida = simulated_annealing(inst, 3.0, 80, 55, 0.96, alfa,beta, tipo_N);  
+            construida = simulated_annealing(inst, 1.5, 40, 15, 0.95, alfa,beta, tipo_N);  
+        }
+
+        if( prsa == set )
+        {
+            construida = path_relinking(pool, construida, alfa, beta);
         }
 		
 		double avaliacao_corrente = construida.avaliaSolucao(alfa,beta);
@@ -398,20 +430,7 @@ Solucao grasp_with_setings(Instancia *inst, PoliticaDeAlocacao politica, double 
 		}
 	}
     
-    if( prsa == set )
-    {
-    	Solucao s = path_relinking(pool, alfa, beta);
-    	double ava = s.avaliaSolucao(alfa,beta);
 
-    	if(ava < Zmin)
-    	{
-    	    Zmin = ava;
-            new_timer = clock();
-            delta = (new_timer - start_time) / (double)CLOCKS_PER_SEC;
-            storeSample(samples, Zmin, delta); 
-    	}
-        melhor_solucao = s;
-	}
 
     new_timer = clock();
     delta = (new_timer - start_time) / (double)CLOCKS_PER_SEC;

@@ -30,7 +30,7 @@ using namespace std;
 namespace std {
 
 typedef enum{
-    bvt,
+    hc,
     sa,
     prsa
 } grasp_config;
